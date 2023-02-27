@@ -3,7 +3,7 @@
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-02-26 09:31:18 am                                       *
+ * Last Modified: 2023-02-27 05:25:49 pm                                       *
  * Modified By: Mathieu Escouteloup                                            *
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
@@ -26,7 +26,7 @@ object LsuConfigBase extends LsuConfig (
   nAddrBit = 32,
   nDataBit = 32,
 
-  useCeps = false,
+  useChamp = false,
   nDome = 1,
   nPart = 1,
 

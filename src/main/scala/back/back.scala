@@ -3,7 +3,7 @@
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-02-26 09:28:06 am                                       *
+ * Last Modified: 2023-02-27 05:25:08 pm                                       *
  * Modified By: Mathieu Escouteloup                                            *
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
@@ -62,7 +62,7 @@ class Back (p: BackParams) extends Module {
 
     val b_int = Vec(p.nBackPort, new GenRVIO(p, new IntQueueBus(p), UInt(0.W)))
     val b_lsu = Vec(p.nBackPort, new GenRVIO(p, new LsuQueueBus(p), UInt(0.W)))
-    val b_dmu = if (p.useCeps) Some(Vec(p.nBackPort, new GenRVIO(p, new ExtReqQueueBus(p, new DmuCtrlBus()), UInt(0.W)))) else None
+    val b_dmu = if (p.useChamp) Some(Vec(p.nBackPort, new GenRVIO(p, new ExtReqQueueBus(p, new DmuCtrlBus()), UInt(0.W)))) else None
   
     val o_dbg = if (p.debug) Some(Output(new DbgBus(p))) else None
     val o_etd = if (p.debug) Some(Output(Vec(p.nCommit, new EtdBus(p.nHart, p.nAddrBit, p.nInstrBit)))) else None
@@ -152,7 +152,7 @@ class Back (p: BackParams) extends Module {
 
   m_iss.io.b_int <> io.b_int
   m_iss.io.b_lsu <> io.b_lsu
-  if (p.useCeps) m_iss.io.b_dmu.get <> io.b_dmu.get
+  if (p.useChamp) m_iss.io.b_dmu.get <> io.b_dmu.get
 
   // ******************************
   //              I/O

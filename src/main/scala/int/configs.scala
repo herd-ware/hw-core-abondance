@@ -3,7 +3,7 @@
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-02-26 09:30:41 am                                       *
+ * Last Modified: 2023-02-27 05:25:38 pm                                       *
  * Modified By: Mathieu Escouteloup                                            *
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
@@ -50,7 +50,7 @@ object IntUnitConfigBase extends IntUnitConfig (
   nAddrBit = 32,
   nDataBit = 32,
 
-  useCeps = false,
+  useChamp = false,
   nDome = 1,
   nPart = 1,
 
@@ -69,7 +69,7 @@ object IntConfigBase extends IntConfig (
   nAddrBit = 32,
   nDataBit = 32,
 
-  useCeps = false,
+  useChamp = false,
   nDome = 1,
   nPart = 1,
   

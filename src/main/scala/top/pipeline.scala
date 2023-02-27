@@ -3,7 +3,7 @@
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-02-26 09:32:04 am                                       *
+ * Last Modified: 2023-02-27 05:24:14 pm                                       *
  * Modified By: Mathieu Escouteloup                                            *
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
@@ -46,7 +46,7 @@ class Pipeline (p: PipelineParams) extends Module {
     val b_d1mem = new Mb4sIO(p.pL0D1Bus)    
     val b_cbo = if (p.useCbo) Some(new CboIO(1, p.useDome, p.nDome, p.nAddrBit)) else None
 
-    val b_dmu = if (p.useCeps) Some(Flipped(new DmuIO(p, p.nAddrBit, p.nDataBit, p.nCepsTrapLvl))) else None
+    val b_dmu = if (p.useChamp) Some(Flipped(new DmuIO(p, p.nAddrBit, p.nDataBit, p.nChampTrapLvl))) else None
     val b_csr_mem = new CsrMemIO()
     val b_clint = Flipped(new ClintIO(p.nDataBit))
 
@@ -60,7 +60,7 @@ class Pipeline (p: PipelineParams) extends Module {
   val m_int = Module(new IntPipeline(p))
   val m_lsu = Module(new Lsu(p))
   val m_csr = Module(new Csr(p))
-  val m_dmu = if (p.useCeps) Some(Module(new Ext(p, new DmuCtrlBus(), 1, p.nDmuQueue, 4))) else None
+  val m_dmu = if (p.useChamp) Some(Module(new Ext(p, new DmuCtrlBus(), 1, p.nDmuQueue, 4))) else None
 
   // ******************************
   //           NEW BRANCH
@@ -130,7 +130,7 @@ class Pipeline (p: PipelineParams) extends Module {
   for (r <- 0 until 3) {
     m_back.io.b_read(2 * p.nIntUnit + r) <> m_lsu.io.b_read(r)
   }
-  if (p.useCeps) {
+  if (p.useChamp) {
     m_dmu.get.io.b_read(0) := DontCare
     m_dmu.get.io.b_read(0).ready := false.B
     m_back.io.b_read(2 * p.nIntUnit + 3) <> m_dmu.get.io.b_read(1)
@@ -145,7 +145,7 @@ class Pipeline (p: PipelineParams) extends Module {
   for (l <- 0 until p.nLoad) {
     m_back.io.i_byp(p.nIntBypass + l) := m_lsu.io.o_byp(l)
   }
-  if (p.useCeps) m_back.io.i_byp(p.nIntBypass + p.nLoad) := m_dmu.get.io.o_byp(0)
+  if (p.useChamp) m_back.io.i_byp(p.nIntBypass + p.nLoad) := m_dmu.get.io.o_byp(0)
 
   // ------------------------------
   //              PC
@@ -153,7 +153,7 @@ class Pipeline (p: PipelineParams) extends Module {
   for (iu <- 0 until p.nIntUnit) {
     m_back.io.b_pc(iu) <> m_int.io.b_pc(iu)
   }
-  if (p.useCeps) m_dmu.get.io.b_pc(0) := DontCare
+  if (p.useChamp) m_dmu.get.io.b_pc(0) := DontCare
 
   // ------------------------------
   //             WRITE
@@ -164,7 +164,7 @@ class Pipeline (p: PipelineParams) extends Module {
   for (l <- 0 until p.nLoad) {
     m_back.io.b_write(p.nIntUnit + l) <> m_lsu.io.b_write(l)
   }
-  if (p.useCeps) m_back.io.b_write(p.nIntUnit + p.nLoad) <> m_dmu.get.io.b_write(0)
+  if (p.useChamp) m_back.io.b_write(p.nIntUnit + p.nLoad) <> m_dmu.get.io.b_write(0)
 
   // ------------------------------
   //              END
@@ -175,7 +175,7 @@ class Pipeline (p: PipelineParams) extends Module {
   for (l <- 0 until p.nLoad) {
     m_back.io.b_end(p.nIntUnit + l) <> m_lsu.io.b_end(l)
   }
-  if (p.useCeps) m_back.io.b_end(p.nIntUnit + p.nLoad) <> m_dmu.get.io.b_end(0)
+  if (p.useChamp) m_back.io.b_end(p.nIntUnit + p.nLoad) <> m_dmu.get.io.b_end(0)
 
   // ******************************
   //             INT
@@ -215,7 +215,7 @@ class Pipeline (p: PipelineParams) extends Module {
   // ******************************
   //             DMU
   // ******************************
-  if (p.useCeps) {
+  if (p.useChamp) {
     m_dmu.get.io.b_unit.get <> io.b_hart.get
     m_dmu.get.io.i_flush := m_back.io.o_init
     m_dmu.get.io.b_in <> m_back.io.b_dmu.get
@@ -270,7 +270,7 @@ class Pipeline (p: PipelineParams) extends Module {
   m_csr.io.i_stat(0) := m_back.io.o_stat
   m_csr.io.b_mem(0) <> io.b_csr_mem
   m_csr.io.i_trap(0) := m_back.io.o_trap
-  if (p.useCeps) m_csr.io.b_dmu.get(0) <> io.b_dmu.get.csr
+  if (p.useChamp) m_csr.io.b_dmu.get(0) <> io.b_dmu.get.csr
   m_csr.io.b_clint(0) <> io.b_clint
   
   // ******************************
@@ -322,7 +322,7 @@ class Pipeline (p: PipelineParams) extends Module {
     //       EXECUTION TRACKER
     // ------------------------------  
     io.o_etd.get := m_back.io.o_etd.get
-    if (p.useCeps) {
+    if (p.useChamp) {
       io.b_dmu.get.req.ctrl.get.etd.get := m_dmu.get.io.b_port.req(0).ctrl.get.etd.get
       m_dmu.get.io.b_port.ack(0).ctrl.get.etd.get := DontCare
     }

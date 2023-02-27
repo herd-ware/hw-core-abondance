@@ -1,9 +1,9 @@
 /*
- * File: abondance.scala                                                        *
+ * File: abondance.scala                                                       *
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-02-26 09:31:57 am                                       *
+ * Last Modified: 2023-02-27 05:24:29 pm                                       *
  * Modified By: Mathieu Escouteloup                                            *
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
@@ -39,10 +39,10 @@ class Abondance (p: AbondanceParams) extends Module {
     val b_dmem = if (!p.useL2 && p.useL1D) Some(new Mb4sIO(p.pLLDBus)) else None
     val b_mem = if (p.useL2) Some(new Mb4sIO(p.pLLDBus)) else None
 
-    val i_irq_lei = if (p.useCeps) Some(Input(Vec(p.nCepsTrapLvl, Bool()))) else None
-    val i_irq_lsi = if (p.useCeps) Some(Input(Vec(p.nCepsTrapLvl, Bool()))) else None
-    val i_irq_mei = if (!p.useCeps) Some(Input(Bool())) else None
-    val i_irq_msi = if (!p.useCeps) Some(Input(Bool())) else None
+    val i_irq_lei = if (p.useChamp) Some(Input(Vec(p.nChampTrapLvl, Bool()))) else None
+    val i_irq_lsi = if (p.useChamp) Some(Input(Vec(p.nChampTrapLvl, Bool()))) else None
+    val i_irq_mei = if (!p.useChamp) Some(Input(Bool())) else None
+    val i_irq_msi = if (!p.useChamp) Some(Input(Bool())) else None
 
     val o_dbg = if (p.debug) Some(Output(new AbondanceDbgBus(p))) else None
     val o_etd = if (p.debug) Some(Output(Vec(p.nCommit, new EtdBus(p.nHart, p.nAddrBit, p.nInstrBit)))) else None
@@ -52,7 +52,7 @@ class Abondance (p: AbondanceParams) extends Module {
   //            MODULES
   // ******************************
   val m_pipe = Module(new Pipeline(p))
-  val m_dmu = if (p.useCeps) Some(Module(new Dmu(p.pDmu))) else None
+  val m_dmu = if (p.useChamp) Some(Module(new Dmu(p.pDmu))) else None
   val m_pall = if (p.useDome) Some(Module(new StaticSlct(p.nDome, p.nPart, 1))) else None
   val m_io = Module(new IOCore(p.pIO))
   val m_l0dcross = Module(new Mb4sCrossbar(p.pL0DCross))
@@ -134,7 +134,7 @@ class Abondance (p: AbondanceParams) extends Module {
   if (p.useDome) m_l0dcross.io.b_dome.get <> m_dmu.get.io.b_dome
   m_l0dcross.io.b_m(0) <> m_pipe.io.b_d0mem
   m_l0dcross.io.b_m(1) <> m_pipe.io.b_d1mem
-  if (p.useCeps) m_l0dcross.io.b_m(2) <> m_dmu.get.io.b_dmem
+  if (p.useChamp) m_l0dcross.io.b_m(2) <> m_dmu.get.io.b_dmem
   m_l0dcross.io.b_s(0) <> m_io.io.b_port 
   if (!p.useL1D && !p.useL2) {
     m_l0dcross.io.b_s(1) <> io.b_d0mem.get  
@@ -272,7 +272,7 @@ class Abondance (p: AbondanceParams) extends Module {
   // ******************************
   //             CLINT
   // ******************************
-  if (p.useCeps) {
+  if (p.useChamp) {
     m_io.io.b_dome.get <> m_dmu.get.io.b_dome
 
     m_io.io.i_irq_lei.get := io.i_irq_lei.get 
@@ -285,7 +285,7 @@ class Abondance (p: AbondanceParams) extends Module {
   // ******************************
   //              DMU
   // ******************************
-  if (p.useCeps) {
+  if (p.useChamp) {
     // ------------------------------
     //             PORT
     // ------------------------------
@@ -365,7 +365,7 @@ class Abondance (p: AbondanceParams) extends Module {
     io.o_dbg.get.last := m_pipe.io.o_dbg.get.last
     io.o_dbg.get.x := m_pipe.io.o_dbg.get.x
     io.o_dbg.get.csr := m_pipe.io.o_dbg.get.csr
-    if (p.useCeps) io.o_dbg.get.dc.get := m_dmu.get.io.o_dbg.get
+    if (p.useChamp) io.o_dbg.get.dc.get := m_dmu.get.io.o_dbg.get
 
     // ------------------------------
     //         DATA FOOTPRINT

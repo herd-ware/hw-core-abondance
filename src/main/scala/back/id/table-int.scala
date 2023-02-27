@@ -3,7 +3,7 @@
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-02-26 09:27:49 am                                       *
+ * Last Modified: 2023-02-27 05:19:14 pm                                       *
  * Modified By: Mathieu Escouteloup                                            *
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
@@ -20,7 +20,7 @@ import chisel3.util._
 
 import herd.common.isa.base.{INSTR => BASE}
 import herd.common.isa.priv.{INSTR => PRIV}
-import herd.common.isa.ceps.{INSTR => CEPS}
+import herd.common.isa.champ.{INSTR => CHAMP}
 import herd.core.abondance.int.{INTUNIT, INTUOP}
 import herd.core.aubrac.back.{OP, IMM}
 
@@ -310,33 +310,33 @@ object TABLEINTPRIV extends TABLEINT {
   PRIV.WFI          -> List(  1.B,  1.B,  0.B,  1.B,  EXTYPE.X,     INTUNIT.X,      INTUOP.X,       0.B,  0.B,  0.B,  OP.XREG,  OP.X,     OP.X,     IMM.X,    IMM.X))
 }
 
-object TABLEINTCEPS extends TABLEINT {
+object TABLEINTCHAMP extends TABLEINT {
   val table : Array[(BitPat, List[UInt])] =
               Array[(BitPat, List[UInt])](
   //                        is Valid?         Gen exc ?               Int Unit         Int Uop     S1 Sign     S3 Sign          S2 Type   S3 Type            Imm2 Type
   //                           | use Serial?     |      Ex Type          |                |          |   S2 Sign |    S1 Type     |         |      Imm1 Type     |
   //                           |     |   is WB?  |        |              |                |          |     |     |      |         |         |          |         |
   //                           |     |     |     |        |              |                |          |     |     |      |         |         |          |         |
-  CEPS.ADD          -> List(  1.B,  0.B,  1.B,  0.B,  EXTYPE.DMU,   INTUNIT.X,      INTUOP.X,       0.B,  0.B,  0.B,  OP.X,     OP.XREG,  OP.IMM1,  IMM.isR,  IMM.X),
-  CEPS.SUB          -> List(  1.B,  0.B,  1.B,  0.B,  EXTYPE.DMU,   INTUNIT.X,      INTUOP.X,       0.B,  0.B,  0.B,  OP.X,     OP.XREG,  OP.IMM1,  IMM.isR,  IMM.X),
-  CEPS.SET          -> List(  1.B,  0.B,  1.B,  0.B,  EXTYPE.DMU,   INTUNIT.X,      INTUOP.X,       0.B,  0.B,  0.B,  OP.X,     OP.XREG,  OP.IMM1,  IMM.isR,  IMM.X),
-  CEPS.CLEAR        -> List(  1.B,  0.B,  1.B,  0.B,  EXTYPE.DMU,   INTUNIT.X,      INTUOP.X,       0.B,  0.B,  0.B,  OP.X,     OP.XREG,  OP.IMM1,  IMM.isR,  IMM.X),
-  CEPS.MVCX         -> List(  1.B,  0.B,  1.B,  0.B,  EXTYPE.DMU,   INTUNIT.X,      INTUOP.X,       0.B,  0.B,  0.B,  OP.X,     OP.XREG,  OP.IMM1,  IMM.isR,  IMM.X),
-  CEPS.MVXC         -> List(  1.B,  0.B,  1.B,  0.B,  EXTYPE.DMU,   INTUNIT.X,      INTUOP.X,       0.B,  0.B,  0.B,  OP.X,     OP.XREG,  OP.IMM1,  IMM.isR,  IMM.X),
-  CEPS.MV           -> List(  1.B,  0.B,  1.B,  0.B,  EXTYPE.DMU,   INTUNIT.X,      INTUOP.X,       0.B,  0.B,  0.B,  OP.X,     OP.X,     OP.X,     IMM.X,    IMM.X),    
-  CEPS.LOAD         -> List(  1.B,  0.B,  0.B,  1.B,  EXTYPE.DMU,   INTUNIT.X,      INTUOP.X,       0.B,  0.B,  0.B,  OP.X,     OP.XREG,  OP.IMM1,  IMM.isS,  IMM.X),
-  CEPS.STORE        -> List(  1.B,  0.B,  0.B,  1.B,  EXTYPE.DMU,   INTUNIT.X,      INTUOP.X,       0.B,  0.B,  0.B,  OP.X,     OP.XREG,  OP.IMM1,  IMM.isS,  IMM.X),
-  CEPS.SWITCHV      -> List(  1.B,  1.B,  1.B,  0.B,  EXTYPE.DMU,   INTUNIT.X,      INTUOP.X,       0.B,  0.B,  0.B,  OP.X,     OP.X,     OP.X,     IMM.X,    IMM.X),
-  CEPS.SWITCHL      -> List(  1.B,  1.B,  1.B,  0.B,  EXTYPE.DMU,   INTUNIT.X,      INTUOP.X,       0.B,  0.B,  0.B,  OP.X,     OP.X,     OP.X,     IMM.X,    IMM.X),
-  CEPS.SWITCHC      -> List(  1.B,  1.B,  1.B,  0.B,  EXTYPE.DMU,   INTUNIT.X,      INTUOP.X,       0.B,  0.B,  0.B,  OP.X,     OP.X,     OP.X,     IMM.X,    IMM.X),
-  CEPS.SWITCHJV     -> List(  1.B,  1.B,  1.B,  0.B,  EXTYPE.DMU,   INTUNIT.X,      INTUOP.X,       0.B,  0.B,  0.B,  OP.X,     OP.XREG,  OP.X,     IMM.X,    IMM.X),
-  CEPS.SWITCHJL     -> List(  1.B,  1.B,  1.B,  0.B,  EXTYPE.DMU,   INTUNIT.X,      INTUOP.X,       0.B,  0.B,  0.B,  OP.X,     OP.XREG,  OP.X,     IMM.X,    IMM.X),
-  CEPS.SWITCHJC     -> List(  1.B,  1.B,  1.B,  0.B,  EXTYPE.DMU,   INTUNIT.X,      INTUOP.X,       0.B,  0.B,  0.B,  OP.X,     OP.XREG,  OP.X,     IMM.X,    IMM.X),
-  CEPS.CHECKV       -> List(  1.B,  0.B,  1.B,  0.B,  EXTYPE.DMU,   INTUNIT.X,      INTUOP.X,       0.B,  0.B,  0.B,  OP.X,     OP.X,     OP.X,     IMM.X,    IMM.X),
-  CEPS.CHECKU       -> List(  1.B,  0.B,  1.B,  0.B,  EXTYPE.DMU,   INTUNIT.X,      INTUOP.X,       0.B,  0.B,  0.B,  OP.X,     OP.X,     OP.X,     IMM.X,    IMM.X),
-  CEPS.CHECKL       -> List(  1.B,  0.B,  1.B,  0.B,  EXTYPE.DMU,   INTUNIT.X,      INTUOP.X,       0.B,  0.B,  0.B,  OP.X,     OP.X,     OP.X,     IMM.X,    IMM.X),
-  CEPS.CHECKC       -> List(  1.B,  0.B,  1.B,  0.B,  EXTYPE.DMU,   INTUNIT.X,      INTUOP.X,       0.B,  0.B,  0.B,  OP.X,     OP.X,     OP.X,     IMM.X,    IMM.X),
-  CEPS.SWITCHRL0    -> List(  1.B,  1.B,  1.B,  0.B,  EXTYPE.DMU,   INTUNIT.X,      INTUOP.X,       0.B,  0.B,  0.B,  OP.X,     OP.X,     OP.X,     IMM.X,    IMM.X),
-  CEPS.SWITCHRL1    -> List(  1.B,  1.B,  1.B,  0.B,  EXTYPE.DMU,   INTUNIT.X,      INTUOP.X,       0.B,  0.B,  0.B,  OP.X,     OP.X,     OP.X,     IMM.X,    IMM.X),
-  CEPS.WFI          -> List(  1.B,  1.B,  0.B,  1.B,  EXTYPE.DMU,   INTUNIT.X,      INTUOP.X,       0.B,  0.B,  0.B,  OP.X,     OP.X,     OP.X,     IMM.X,    IMM.X))
+  CHAMP.ADD         -> List(  1.B,  0.B,  1.B,  0.B,  EXTYPE.DMU,   INTUNIT.X,      INTUOP.X,       0.B,  0.B,  0.B,  OP.X,     OP.XREG,  OP.IMM1,  IMM.isR,  IMM.X),
+  CHAMP.SUB         -> List(  1.B,  0.B,  1.B,  0.B,  EXTYPE.DMU,   INTUNIT.X,      INTUOP.X,       0.B,  0.B,  0.B,  OP.X,     OP.XREG,  OP.IMM1,  IMM.isR,  IMM.X),
+  CHAMP.SET         -> List(  1.B,  0.B,  1.B,  0.B,  EXTYPE.DMU,   INTUNIT.X,      INTUOP.X,       0.B,  0.B,  0.B,  OP.X,     OP.XREG,  OP.IMM1,  IMM.isR,  IMM.X),
+  CHAMP.CLEAR       -> List(  1.B,  0.B,  1.B,  0.B,  EXTYPE.DMU,   INTUNIT.X,      INTUOP.X,       0.B,  0.B,  0.B,  OP.X,     OP.XREG,  OP.IMM1,  IMM.isR,  IMM.X),
+  CHAMP.MVCX        -> List(  1.B,  0.B,  1.B,  0.B,  EXTYPE.DMU,   INTUNIT.X,      INTUOP.X,       0.B,  0.B,  0.B,  OP.X,     OP.XREG,  OP.IMM1,  IMM.isR,  IMM.X),
+  CHAMP.MVXC        -> List(  1.B,  0.B,  1.B,  0.B,  EXTYPE.DMU,   INTUNIT.X,      INTUOP.X,       0.B,  0.B,  0.B,  OP.X,     OP.XREG,  OP.IMM1,  IMM.isR,  IMM.X),
+  CHAMP.MV          -> List(  1.B,  0.B,  1.B,  0.B,  EXTYPE.DMU,   INTUNIT.X,      INTUOP.X,       0.B,  0.B,  0.B,  OP.X,     OP.X,     OP.X,     IMM.X,    IMM.X),    
+  CHAMP.LOAD        -> List(  1.B,  0.B,  0.B,  1.B,  EXTYPE.DMU,   INTUNIT.X,      INTUOP.X,       0.B,  0.B,  0.B,  OP.X,     OP.XREG,  OP.IMM1,  IMM.isS,  IMM.X),
+  CHAMP.STORE       -> List(  1.B,  0.B,  0.B,  1.B,  EXTYPE.DMU,   INTUNIT.X,      INTUOP.X,       0.B,  0.B,  0.B,  OP.X,     OP.XREG,  OP.IMM1,  IMM.isS,  IMM.X),
+  CHAMP.SWITCHV     -> List(  1.B,  1.B,  1.B,  0.B,  EXTYPE.DMU,   INTUNIT.X,      INTUOP.X,       0.B,  0.B,  0.B,  OP.X,     OP.X,     OP.X,     IMM.X,    IMM.X),
+  CHAMP.SWITCHL     -> List(  1.B,  1.B,  1.B,  0.B,  EXTYPE.DMU,   INTUNIT.X,      INTUOP.X,       0.B,  0.B,  0.B,  OP.X,     OP.X,     OP.X,     IMM.X,    IMM.X),
+  CHAMP.SWITCHC     -> List(  1.B,  1.B,  1.B,  0.B,  EXTYPE.DMU,   INTUNIT.X,      INTUOP.X,       0.B,  0.B,  0.B,  OP.X,     OP.X,     OP.X,     IMM.X,    IMM.X),
+  CHAMP.SWITCHJV    -> List(  1.B,  1.B,  1.B,  0.B,  EXTYPE.DMU,   INTUNIT.X,      INTUOP.X,       0.B,  0.B,  0.B,  OP.X,     OP.XREG,  OP.X,     IMM.X,    IMM.X),
+  CHAMP.SWITCHJL    -> List(  1.B,  1.B,  1.B,  0.B,  EXTYPE.DMU,   INTUNIT.X,      INTUOP.X,       0.B,  0.B,  0.B,  OP.X,     OP.XREG,  OP.X,     IMM.X,    IMM.X),
+  CHAMP.SWITCHJC    -> List(  1.B,  1.B,  1.B,  0.B,  EXTYPE.DMU,   INTUNIT.X,      INTUOP.X,       0.B,  0.B,  0.B,  OP.X,     OP.XREG,  OP.X,     IMM.X,    IMM.X),
+  CHAMP.CHECKV      -> List(  1.B,  0.B,  1.B,  0.B,  EXTYPE.DMU,   INTUNIT.X,      INTUOP.X,       0.B,  0.B,  0.B,  OP.X,     OP.X,     OP.X,     IMM.X,    IMM.X),
+  CHAMP.CHECKU      -> List(  1.B,  0.B,  1.B,  0.B,  EXTYPE.DMU,   INTUNIT.X,      INTUOP.X,       0.B,  0.B,  0.B,  OP.X,     OP.X,     OP.X,     IMM.X,    IMM.X),
+  CHAMP.CHECKL      -> List(  1.B,  0.B,  1.B,  0.B,  EXTYPE.DMU,   INTUNIT.X,      INTUOP.X,       0.B,  0.B,  0.B,  OP.X,     OP.X,     OP.X,     IMM.X,    IMM.X),
+  CHAMP.CHECKC      -> List(  1.B,  0.B,  1.B,  0.B,  EXTYPE.DMU,   INTUNIT.X,      INTUOP.X,       0.B,  0.B,  0.B,  OP.X,     OP.X,     OP.X,     IMM.X,    IMM.X),
+  CHAMP.SWITCHRL0   -> List(  1.B,  1.B,  1.B,  0.B,  EXTYPE.DMU,   INTUNIT.X,      INTUOP.X,       0.B,  0.B,  0.B,  OP.X,     OP.X,     OP.X,     IMM.X,    IMM.X),
+  CHAMP.SWITCHRL1   -> List(  1.B,  1.B,  1.B,  0.B,  EXTYPE.DMU,   INTUNIT.X,      INTUOP.X,       0.B,  0.B,  0.B,  OP.X,     OP.X,     OP.X,     IMM.X,    IMM.X),
+  CHAMP.WFI         -> List(  1.B,  1.B,  0.B,  1.B,  EXTYPE.DMU,   INTUNIT.X,      INTUOP.X,       0.B,  0.B,  0.B,  OP.X,     OP.X,     OP.X,     IMM.X,    IMM.X))
 }

@@ -3,7 +3,7 @@
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-02-26 09:28:20 am                                       *
+ * Last Modified: 2023-02-27 05:25:00 pm                                       *
  * Modified By: Mathieu Escouteloup                                            *
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
@@ -44,7 +44,7 @@ class IssStage(p: BackParams) extends Module {
 
     val b_int = Vec(p.nBackPort, new GenRVIO(p, new IntQueueBus(p), UInt(0.W)))
     val b_lsu = Vec(p.nBackPort, new GenRVIO(p, new LsuQueueBus(p), UInt(0.W)))
-    val b_dmu = if (p.useCeps) Some(Vec(p.nBackPort, new GenRVIO(p, new ExtReqQueueBus(p, new DmuCtrlBus()), UInt(0.W)))) else None
+    val b_dmu = if (p.useChamp) Some(Vec(p.nBackPort, new GenRVIO(p, new ExtReqQueueBus(p, new DmuCtrlBus()), UInt(0.W)))) else None
   })
 
   val w_wait = Wire(Bool())
@@ -218,7 +218,7 @@ class IssStage(p: BackParams) extends Module {
     // ------------------------------
     //             DMU
     // ------------------------------
-    if (p.useCeps) {
+    if (p.useChamp) {
       w_dmu_wait(bp) := io.b_in(bp).valid & w_back_valid(bp) & ~w_back_flush(bp) & (io.b_in(bp).ctrl.get.ex.ex_type === EXTYPE.DMU) & ~io.b_dmu.get(bp).ready
       io.b_dmu.get(bp).valid := io.b_in(bp).valid & w_back_valid(bp) & ~w_back_flush(bp) & (io.b_in(bp).ctrl.get.ex.ex_type === EXTYPE.DMU) & ~w_int_wait.asUInt.orR & ~w_lsu_wait.asUInt.orR
       io.b_dmu.get(bp).ctrl.get.info := io.b_in(bp).ctrl.get.info
@@ -272,7 +272,7 @@ class IssStage(p: BackParams) extends Module {
     for (bp <- 0 until p.nBackPort) {
       io.b_int(bp).ctrl.get.etd.get := io.b_in(bp).ctrl.get.etd.get
       io.b_lsu(bp).ctrl.get.etd.get := io.b_in(bp).ctrl.get.etd.get
-      if (p.useCeps) io.b_dmu.get(bp).ctrl.get.etd.get := io.b_in(bp).ctrl.get.etd.get
+      if (p.useChamp) io.b_dmu.get(bp).ctrl.get.etd.get := io.b_in(bp).ctrl.get.etd.get
     }
   }
 }

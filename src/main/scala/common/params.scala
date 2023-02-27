@@ -3,7 +3,7 @@
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-02-26 09:29:45 am                                       *
+ * Last Modified: 2023-02-27 05:26:04 pm                                       *
  * Modified By: Mathieu Escouteloup                                            *
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
@@ -32,8 +32,8 @@ trait ExUnitParams extends GenParams {
   def nDataByte: Int = (nDataBit/8).toInt
   def nInstrBit: Int = 32
 
-  def useCeps: Boolean
-  def useDome: Boolean = useCeps
+  def useChamp: Boolean
+  def useDome: Boolean = useChamp
   def nDome: Int
   def multiDome: Boolean
   def nPart: Int

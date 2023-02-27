@@ -3,7 +3,7 @@
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-02-26 09:30:55 am                                       *
+ * Last Modified: 2023-02-27 05:25:29 pm                                       *
  * Modified By: Mathieu Escouteloup                                            *
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
@@ -31,7 +31,7 @@ trait IntUnitParams extends ExUnitParams {
   def nAddrBit: Int
   def nDataBit: Int
 
-  def useCeps: Boolean
+  def useChamp: Boolean
   def nDome: Int
   def multiDome: Boolean = false
   def nPart: Int
@@ -77,7 +77,7 @@ case class IntUnitConfig (
   nAddrBit: Int,
   nDataBit: Int,
 
-  useCeps: Boolean,
+  useChamp: Boolean,
   nDome: Int,
   nPart: Int,
 
@@ -110,7 +110,7 @@ trait IntParams extends ExUnitParams {
   def nAddrBit: Int
   def nDataBit: Int
 
-  def useCeps: Boolean
+  def useChamp: Boolean
   def nDome: Int
   def multiDome: Boolean = false
   def nPart: Int
@@ -139,7 +139,7 @@ trait IntParams extends ExUnitParams {
         nSpecBranch = nSpecBranch,
         nCommit = nCommit,
         nGprPhy = nGprPhy,
-        useCeps = useCeps,
+        useChamp = useChamp,
         nDome = nDome,
         nPart = nPart,
         iIntUnit = iIntUnit(nu)
@@ -230,7 +230,7 @@ case class IntConfig (
   nAddrBit: Int,
   nDataBit: Int,
 
-  useCeps: Boolean,
+  useChamp: Boolean,
   nDome: Int,
   nPart: Int,
 

@@ -3,7 +3,7 @@
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-02-26 09:32:00 am                                       *
+ * Last Modified: 2023-02-27 05:26:22 pm                                       *
  * Modified By: Mathieu Escouteloup                                            *
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
@@ -54,14 +54,14 @@ trait PipelineParams extends NlpParams
   def nDataBit: Int
 
   // ------------------------------
-  //             CEPS
+  //            CHAMP
   // ------------------------------
-  def useCeps: Boolean
-  override def useDome: Boolean = useCeps
+  def useChamp: Boolean
+  override def useDome: Boolean = useChamp
   def nDome: Int
   override def multiDome: Boolean = false
   def nPart: Int
-  def nCepsTrapLvl: Int
+  def nChampTrapLvl: Int
 
   // ------------------------------
   //           FRONT END
@@ -106,7 +106,7 @@ trait PipelineParams extends NlpParams
 
   def nExUnit: Int = {
     var n: Int = nIntUnit + nLoad
-    if (useCeps) {
+    if (useChamp) {
       n = n + 1
     }
     return n
@@ -115,7 +115,7 @@ trait PipelineParams extends NlpParams
   def useRobReplay: Boolean = useSpecLoad
   def nBypass: Int = {
     var n:Int = nIntBypass + nLoad
-    if (useCeps) {
+    if (useChamp) {
       n = n + 1
     }
     return n
@@ -125,7 +125,7 @@ trait PipelineParams extends NlpParams
   def nGprReadPhy: Int
   def nGprReadLog: Int = {
     var n:Int = 2 * nIntUnit + 3
-    if (useCeps) {
+    if (useChamp) {
       n = n + 1
     }
     return n
@@ -133,7 +133,7 @@ trait PipelineParams extends NlpParams
   def nGprWritePhy: Int
   def nGprWriteLog: Int = {
     var n:Int = nIntUnit + nLoad
-    if (useCeps) {
+    if (useChamp) {
       n = n + 1
     }
     return n
@@ -150,12 +150,12 @@ case class PipelineConfig (
   nDataBit: Int,
 
   // ------------------------------
-  //             CEPS
+  //            CHAMP
   // ------------------------------
-  useCeps: Boolean,
+  useChamp: Boolean,
   nDome: Int,
   nPart: Int,
-  nCepsTrapLvl: Int,
+  nChampTrapLvl: Int,
 
   // ------------------------------
   //           FRONT END
@@ -216,13 +216,13 @@ trait AbondanceParams extends PipelineParams {
   def nDataBit: Int
 
   // ------------------------------
-  //             CEPS
+  //            CHAMP
   // ------------------------------
-  def useCeps: Boolean
-  def useCepsExtMie: Boolean
-  def useCepsExtFr: Boolean
-  def useCepsExtCst: Boolean
-  def nCepsTrapLvl: Int
+  def useChamp: Boolean
+  def useChampExtMie: Boolean
+  def useChampExtFr: Boolean
+  def useChampExtCst: Boolean
+  def nChampTrapLvl: Int
   def nDomeFlushCycle: Int
   def nPart: Int
   def nDomeCfg: Int
@@ -234,11 +234,11 @@ trait AbondanceParams extends PipelineParams {
     nAddrBit = nAddrBit,
     nDataBit = nDataBit,
 
-    useCeps = useCeps,
-    useCepsExtMie = useCepsExtMie,
-    useCepsExtFr = useCepsExtFr,
-    useCepsExtCst = useCepsExtCst,
-    nCepsTrapLvl = nCepsTrapLvl,
+    useChamp = useChamp,
+    useChampExtMie = useChampExtMie,
+    useChampExtFr = useChampExtFr,
+    useChampExtCst = useChampExtCst,
+    nChampTrapLvl = nChampTrapLvl,
     nDomeFlushCycle = nDomeFlushCycle,
     nPart = nPart,
     nDomeCfg = nDomeCfg
@@ -386,7 +386,7 @@ trait AbondanceParams extends PipelineParams {
   // ..............................
   def pL0DArray: Array[Mb4sParams] = {
     var a: Array[Mb4sParams] = Array(pL0D0Bus, pL0D1Bus)
-    if (useCeps) a = a :+ pDmu.pL0DBus
+    if (useChamp) a = a :+ pDmu.pL0DBus
     a
   }
   def pL0DCrossBus: Mb4sParams = MB4S.node(pL0DArray, false)
@@ -405,7 +405,7 @@ trait AbondanceParams extends PipelineParams {
     nAddrBit        = nAddrBit        ,
     nAddrBase       = nIOAddrBase     ,
 
-    nCepsTrapLvl    = nCepsTrapLvl    ,
+    nChampTrapLvl   = nChampTrapLvl    ,
 
     useReqReg       = true            ,
     nScratch        = nScratch        ,
@@ -600,13 +600,13 @@ case class AbondanceConfig (
   nDataBit: Int,
 
   // ------------------------------
-  //             CEPS
+  //            CHAMP
   // ------------------------------
-  useCeps: Boolean,
-  useCepsExtMie: Boolean,
-  useCepsExtFr: Boolean,
-  useCepsExtCst: Boolean,
-  nCepsTrapLvl: Int,
+  useChamp: Boolean,
+  useChampExtMie: Boolean,
+  useChampExtFr: Boolean,
+  useChampExtCst: Boolean,
+  nChampTrapLvl: Int,
   nDomeFlushCycle: Int,
   nPart: Int,
   nDomeCfg: Int,

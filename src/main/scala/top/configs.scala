@@ -3,7 +3,7 @@
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-02-26 09:31:53 am                                       *
+ * Last Modified: 2023-02-27 05:26:27 pm                                       *
  * Modified By: Mathieu Escouteloup                                            *
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
@@ -66,12 +66,12 @@ object PipelineConfigBase extends PipelineConfig (
   nDataBit = 32,
 
   // ------------------------------
-  //             CEPS
+  //            CHAMP
   // ------------------------------
-  useCeps = false,
+  useChamp = false,
   nDome = 1,
   nPart = 1,
-  nCepsTrapLvl = 1,
+  nChampTrapLvl = 1,
 
   // ------------------------------
   //           FRONT END
@@ -131,13 +131,13 @@ object AbondanceConfigBase extends AbondanceConfig (
   nDataBit = 32,
 
   // ------------------------------
-  //             CEPS
+  //            CHAMP
   // ------------------------------
-  useCeps = false,
-  useCepsExtMie = true,
-  useCepsExtFr = false,
-  useCepsExtCst = false,
-  nCepsTrapLvl = 2,
+  useChamp = false,
+  useChampExtMie = true,
+  useChampExtFr = false,
+  useChampExtCst = false,
+  nChampTrapLvl = 2,
   nDomeFlushCycle = 20,
   nPart = 2,
   nDomeCfg = 4,

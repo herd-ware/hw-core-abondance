@@ -3,7 +3,7 @@
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-02-26 09:31:46 am                                       *
+ * Last Modified: 2023-02-27 05:21:19 pm                                       *
  * Modified By: Mathieu Escouteloup                                            *
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
@@ -34,5 +34,5 @@ class AbondanceDbgBus (p: AbondanceParams) extends Bundle {
   val last = UInt(p.nAddrBit.W)
   val x = Vec(32, UInt(p.nDataBit.W))
   val csr = new CsrBus(p.nDataBit, p.useDome)
-  val dc = if (p.useCeps) Some(Vec(p.nDomeCfg, Vec(6, UInt(p.nDataBit.W)))) else None
+  val dc = if (p.useChamp) Some(Vec(p.nDomeCfg, Vec(6, UInt(p.nDataBit.W)))) else None
 }
