@@ -1,10 +1,10 @@
 /*
- * File: bus.scala                                                             *
+ * File: bus.scala
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-02-26 09:28:11 am                                       *
- * Modified By: Mathieu Escouteloup                                            *
+ * Last Modified: 2023-03-01 12:23:24 pm
+ * Modified By: Mathieu Escouteloup
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
  * Copyright (c) 2023 HerdWare                                                 *
@@ -21,7 +21,7 @@ import chisel3.util._
 import herd.common.gen._
 import herd.core.aubrac.common.{TrapBus, EtdBus}
 import herd.core.aubrac.back.{OP, IMM}
-import herd.core.aubrac.dmu.{CODE => DMUCODE, OP => DMUOP}
+import herd.core.aubrac.hfu.{CODE => HFUCODE, OP => HFUOP}
 import herd.core.abondance.common._
 import herd.core.abondance.int._
 import herd.core.abondance.lsu._
@@ -109,13 +109,13 @@ class ExtCtrlBus extends Bundle {
   val rd = UInt(5.W)
 }
 
-class DmuCtrlBus extends Bundle {
-  val code = UInt(DMUCODE.NBIT.W)
-  val op1 = UInt(DMUOP.NBIT.W)
-  val op2 = UInt(DMUOP.NBIT.W)
-  val op3 = UInt(DMUOP.NBIT.W)
-  val dcs1 = UInt(5.W)
-  val dcs2 = UInt(5.W)
+class HfuCtrlBus extends Bundle {
+  val code = UInt(HFUCODE.NBIT.W)
+  val op1 = UInt(HFUOP.NBIT.W)
+  val op2 = UInt(HFUOP.NBIT.W)
+  val op3 = UInt(HFUOP.NBIT.W)
+  val hfs1 = UInt(5.W)
+  val hfs2 = UInt(5.W)
 }
 
 // ******************************

@@ -1,10 +1,10 @@
 /*
- * File: gpr.scala                                                             *
+ * File: gpr.scala
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-02-26 09:27:58 am                                       *
- * Modified By: Mathieu Escouteloup                                            *
+ * Last Modified: 2023-02-28 10:41:26 pm
+ * Modified By: Mathieu Escouteloup
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
  * Copyright (c) 2023 HerdWare                                                 *
@@ -18,7 +18,7 @@ package herd.core.abondance.back
 import chisel3._
 import chisel3.util._
 
-import herd.common.isa.base._
+import herd.common.isa.riscv._
 import herd.common.dome._
 import herd.core.abondance.common._
 

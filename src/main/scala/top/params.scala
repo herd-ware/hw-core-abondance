@@ -1,10 +1,10 @@
 /*
- * File: params.scala                                                          *
+ * File: params.scala
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-02-27 05:26:22 pm                                       *
- * Modified By: Mathieu Escouteloup                                            *
+ * Last Modified: 2023-03-01 12:24:32 pm
+ * Modified By: Mathieu Escouteloup
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
  * Copyright (c) 2023 HerdWare                                                 *
@@ -22,7 +22,7 @@ import herd.common.mem.mb4s._
 import herd.core.aubrac.nlp._
 import herd.core.aubrac.front._
 import herd.core.aubrac.back.csr._
-import herd.core.aubrac.dmu._
+import herd.core.aubrac.hfu._
 import herd.core.aubrac.{L1Params, L1Config, L2Params, L2Config}
 import herd.core.abondance.common._
 import herd.core.abondance.back._
@@ -102,7 +102,7 @@ trait PipelineParams extends NlpParams
   def useSpecLoad: Boolean
   def nStoreQueue: Int
   def nMemQueue: Int
-  def nDmuQueue: Int
+  def nHfuQueue: Int
 
   def nExUnit: Int = {
     var n: Int = nIntUnit + nLoad
@@ -195,7 +195,7 @@ case class PipelineConfig (
   useSpecLoad: Boolean,
   nStoreQueue: Int,
   nMemQueue: Int,
-  nDmuQueue: Int,
+  nHfuQueue: Int,
 
   nGprPhy: Int,
   nGprReadPhy: Int,
@@ -219,15 +219,16 @@ trait AbondanceParams extends PipelineParams {
   //            CHAMP
   // ------------------------------
   def useChamp: Boolean
+  def nChampReg: Int
   def useChampExtMie: Boolean
   def useChampExtFr: Boolean
   def useChampExtCst: Boolean
   def nChampTrapLvl: Int
+  
   def nDomeFlushCycle: Int
   def nPart: Int
-  def nDomeCfg: Int
 
-  def pDmu: DmuParams = new DmuConfig (
+  def pHfu: HfuParams = new HfuConfig (
     debug = debug,
     pcBoot = pcBoot,
     nHart = nHart,
@@ -235,16 +236,17 @@ trait AbondanceParams extends PipelineParams {
     nDataBit = nDataBit,
 
     useChamp = useChamp,
+    nChampReg = nChampReg,
     useChampExtMie = useChampExtMie,
     useChampExtFr = useChampExtFr,
     useChampExtCst = useChampExtCst,
     nChampTrapLvl = nChampTrapLvl,
+
     nDomeFlushCycle = nDomeFlushCycle,
-    nPart = nPart,
-    nDomeCfg = nDomeCfg
+    nPart = nPart
   )
 
-  def nDome: Int = pDmu.nDome
+  def nDome: Int = pHfu.nDome
 
   // ------------------------------
   //           FRONT END
@@ -285,7 +287,7 @@ trait AbondanceParams extends PipelineParams {
   def useSpecLoad: Boolean
   def nStoreQueue: Int
   def nMemQueue: Int
-  def nDmuQueue: Int
+  def nHfuQueue: Int
 
   def nGprPhy: Int
   def nGprReadPhy: Int
@@ -386,7 +388,7 @@ trait AbondanceParams extends PipelineParams {
   // ..............................
   def pL0DArray: Array[Mb4sParams] = {
     var a: Array[Mb4sParams] = Array(pL0D0Bus, pL0D1Bus)
-    if (useChamp) a = a :+ pDmu.pL0DBus
+    if (useChamp) a = a :+ pHfu.pL0DBus
     a
   }
   def pL0DCrossBus: Mb4sParams = MB4S.node(pL0DArray, false)
@@ -603,13 +605,14 @@ case class AbondanceConfig (
   //            CHAMP
   // ------------------------------
   useChamp: Boolean,
+  nChampReg: Int,
   useChampExtMie: Boolean,
   useChampExtFr: Boolean,
   useChampExtCst: Boolean,
   nChampTrapLvl: Int,
+
   nDomeFlushCycle: Int,
   nPart: Int,
-  nDomeCfg: Int,
 
   // ------------------------------
   //           FRONT END
@@ -649,7 +652,7 @@ case class AbondanceConfig (
   useSpecLoad: Boolean,
   nStoreQueue: Int,
   nMemQueue: Int,
-  nDmuQueue: Int,
+  nHfuQueue: Int,
 
   nGprPhy: Int,
   nGprReadPhy: Int,

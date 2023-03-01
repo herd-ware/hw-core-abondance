@@ -1,10 +1,10 @@
 /*
- * File: int.scala                                                             *
+ * File: int.scala
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-02-26 09:30:47 am                                       *
- * Modified By: Mathieu Escouteloup                                            *
+ * Last Modified: 2023-02-28 10:42:03 pm
+ * Modified By: Mathieu Escouteloup
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
  * Copyright (c) 2023 HerdWare                                                 *
@@ -20,7 +20,7 @@ import chisel3.util._
 
 import herd.common.gen._
 import herd.common.dome._
-import herd.common.isa.base._
+import herd.common.isa.riscv._
 import herd.common.mem.cbo._
 import herd.core.aubrac.back.csr.{CsrIO}
 import herd.core.aubrac.nlp.{BranchInfoBus}

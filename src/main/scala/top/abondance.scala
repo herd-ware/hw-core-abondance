@@ -1,10 +1,10 @@
 /*
- * File: abondance.scala                                                       *
+ * File: abondance.scala
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-02-27 05:24:29 pm                                       *
- * Modified By: Mathieu Escouteloup                                            *
+ * Last Modified: 2023-03-01 12:25:21 pm
+ * Modified By: Mathieu Escouteloup
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
  * Copyright (c) 2023 HerdWare                                                 *
@@ -22,7 +22,7 @@ import herd.common.dome._
 import herd.common.mem.mb4s._
 import herd.common.mem.cbo._
 import herd.core.aubrac.common._
-import herd.core.aubrac.dmu._
+import herd.core.aubrac.hfu._
 import herd.core.abondance.common._
 import herd.io.core._
 import herd.mem.hay._
@@ -52,7 +52,7 @@ class Abondance (p: AbondanceParams) extends Module {
   //            MODULES
   // ******************************
   val m_pipe = Module(new Pipeline(p))
-  val m_dmu = if (p.useChamp) Some(Module(new Dmu(p.pDmu))) else None
+  val m_hfu = if (p.useChamp) Some(Module(new Hfu(p.pHfu))) else None
   val m_pall = if (p.useDome) Some(Module(new StaticSlct(p.nDome, p.nPart, 1))) else None
   val m_io = Module(new IOCore(p.pIO))
   val m_l0dcross = Module(new Mb4sCrossbar(p.pL0DCross))
@@ -65,8 +65,8 @@ class Abondance (p: AbondanceParams) extends Module {
   //           PIPELINE
   // ******************************
   if (p.useDome) {
-    m_pipe.io.b_dome.get <> m_dmu.get.io.b_dome 
-    m_pipe.io.b_hart.get <> m_dmu.get.io.b_hart
+    m_pipe.io.b_dome.get <> m_hfu.get.io.b_dome 
+    m_pipe.io.b_hart.get <> m_hfu.get.io.b_hart
   }
 
   m_pipe.io.b_clint <> m_io.io.b_clint
@@ -76,7 +76,7 @@ class Abondance (p: AbondanceParams) extends Module {
   // ******************************
   if (p.useDome) { 
     for (d <- 0 until p.nDome) {
-      m_pall.get.io.i_weight(d) := m_dmu.get.io.b_pall.weight(d)
+      m_pall.get.io.i_weight(d) := m_hfu.get.io.b_pall.weight(d)
     }
 
     if (p.useL1I && p.pL1I.multiDome) {
@@ -109,8 +109,8 @@ class Abondance (p: AbondanceParams) extends Module {
     m_pipe.io.b_csr_mem.l1imiss := m_l1i.get.io.o_miss(0)
 
     if (p.useDome) {
-      m_l1i.get.io.b_dome.get <> m_dmu.get.io.b_dome
-      m_l1i.get.io.b_part.get <> m_dmu.get.io.b_pall
+      m_l1i.get.io.b_dome.get <> m_hfu.get.io.b_dome
+      m_l1i.get.io.b_part.get <> m_hfu.get.io.b_pall
     }
     if (p.useCbo) {
       w_l1i_cbo(0) := m_pipe.io.b_cbo.get.instr
@@ -131,10 +131,10 @@ class Abondance (p: AbondanceParams) extends Module {
   // ------------------------------
   //              L0D
   // ------------------------------
-  if (p.useDome) m_l0dcross.io.b_dome.get <> m_dmu.get.io.b_dome
+  if (p.useDome) m_l0dcross.io.b_dome.get <> m_hfu.get.io.b_dome
   m_l0dcross.io.b_m(0) <> m_pipe.io.b_d0mem
   m_l0dcross.io.b_m(1) <> m_pipe.io.b_d1mem
-  if (p.useChamp) m_l0dcross.io.b_m(2) <> m_dmu.get.io.b_dmem
+  if (p.useChamp) m_l0dcross.io.b_m(2) <> m_hfu.get.io.b_dmem
   m_l0dcross.io.b_s(0) <> m_io.io.b_port 
   if (!p.useL1D && !p.useL2) {
     m_l0dcross.io.b_s(1) <> io.b_d0mem.get  
@@ -153,8 +153,8 @@ class Abondance (p: AbondanceParams) extends Module {
     m_pipe.io.b_csr_mem.l1dmiss := m_l1d.get.io.o_miss(0)
 
     if (p.useDome) {
-      m_l1d.get.io.b_dome.get <> m_dmu.get.io.b_dome
-      m_l1d.get.io.b_part.get <> m_dmu.get.io.b_pall
+      m_l1d.get.io.b_dome.get <> m_hfu.get.io.b_dome
+      m_l1d.get.io.b_part.get <> m_hfu.get.io.b_pall
     }
     if (p.useCbo) {
       w_l1d_cbo(0) := m_pipe.io.b_cbo.get.data
@@ -168,7 +168,7 @@ class Abondance (p: AbondanceParams) extends Module {
     m_l1d.get.io.b_prev(1) <> m_l0dcross.io.b_s(3)
     if (!p.useL2) {
       if (p.useDome) {
-        m_llcross.get.io.b_dome.get <> m_dmu.get.io.b_dome
+        m_llcross.get.io.b_dome.get <> m_hfu.get.io.b_dome
         m_llcross.get.io.i_slct_req.get := m_l1d.get.io.o_slct_next.get
         m_llcross.get.io.i_slct_read.get := m_l1d.get.io.o_slct_prev.get
         m_llcross.get.io.i_slct_write.get := m_l1d.get.io.o_slct_prev.get
@@ -193,25 +193,25 @@ class Abondance (p: AbondanceParams) extends Module {
     m_pipe.io.b_csr_mem.l2miss := m_l2.get.io.o_miss(0)
 
     if (p.useDome) {
-      m_l2.get.io.b_dome.get <> m_dmu.get.io.b_dome
+      m_l2.get.io.b_dome.get <> m_hfu.get.io.b_dome
       for (d <- 0 until p.nDome) {
         if (p.useL1I && p.useL1D) {
-          m_l2.get.io.b_dome.get(d).flush := m_dmu.get.io.b_dome(d).flush & m_l1i.get.io.b_dome.get(d).free & m_l1d.get.io.b_dome.get(d).free
+          m_l2.get.io.b_dome.get(d).flush := m_hfu.get.io.b_dome(d).flush & m_l1i.get.io.b_dome.get(d).free & m_l1d.get.io.b_dome.get(d).free
         } else if (p.useL1I) {        
-          m_l2.get.io.b_dome.get(d).flush := m_dmu.get.io.b_dome(d).flush & m_l1i.get.io.b_dome.get(d).free
+          m_l2.get.io.b_dome.get(d).flush := m_hfu.get.io.b_dome(d).flush & m_l1i.get.io.b_dome.get(d).free
         } else if (p.useL1D) {        
-          m_l2.get.io.b_dome.get(d).flush := m_dmu.get.io.b_dome(d).flush & m_l1d.get.io.b_dome.get(d).free
+          m_l2.get.io.b_dome.get(d).flush := m_hfu.get.io.b_dome(d).flush & m_l1d.get.io.b_dome.get(d).free
         }
       }
 
-      m_l2.get.io.b_part.get <> m_dmu.get.io.b_pall
+      m_l2.get.io.b_part.get <> m_hfu.get.io.b_pall
       for (pa <- 0 until p.nPart) {
         if (p.useL1I && p.useL1D) {
-          m_l2.get.io.b_part.get.state(pa).flush :=  m_dmu.get.io.b_pall.state(pa).flush & m_l1i.get.io.b_part.get.state(pa).free & m_l1d.get.io.b_part.get.state(pa).free
+          m_l2.get.io.b_part.get.state(pa).flush :=  m_hfu.get.io.b_pall.state(pa).flush & m_l1i.get.io.b_part.get.state(pa).free & m_l1d.get.io.b_part.get.state(pa).free
         } else if (p.useL1I) {        
-          m_l2.get.io.b_part.get.state(pa).flush :=  m_dmu.get.io.b_pall.state(pa).flush & m_l1i.get.io.b_part.get.state(pa).free
+          m_l2.get.io.b_part.get.state(pa).flush :=  m_hfu.get.io.b_pall.state(pa).flush & m_l1i.get.io.b_part.get.state(pa).free
         } else if (p.useL1D) {        
-          m_l2.get.io.b_part.get.state(pa).flush :=  m_dmu.get.io.b_pall.state(pa).flush & m_l1d.get.io.b_part.get.state(pa).free
+          m_l2.get.io.b_part.get.state(pa).flush :=  m_hfu.get.io.b_pall.state(pa).flush & m_l1d.get.io.b_part.get.state(pa).free
         }
       }
     }
@@ -250,7 +250,7 @@ class Abondance (p: AbondanceParams) extends Module {
     }
 
     if (p.useDome) {
-      m_llcross.get.io.b_dome.get <> m_dmu.get.io.b_dome
+      m_llcross.get.io.b_dome.get <> m_hfu.get.io.b_dome
       m_llcross.get.io.i_slct_req.get := m_l2.get.io.o_slct_next.get
       m_llcross.get.io.i_slct_read.get := m_l2.get.io.o_slct_prev.get
       m_llcross.get.io.i_slct_write.get := m_l2.get.io.o_slct_prev.get
@@ -273,7 +273,7 @@ class Abondance (p: AbondanceParams) extends Module {
   //             CLINT
   // ******************************
   if (p.useChamp) {
-    m_io.io.b_dome.get <> m_dmu.get.io.b_dome
+    m_io.io.b_dome.get <> m_hfu.get.io.b_dome
 
     m_io.io.i_irq_lei.get := io.i_irq_lei.get 
     m_io.io.i_irq_lsi.get := io.i_irq_lsi.get 
@@ -283,13 +283,13 @@ class Abondance (p: AbondanceParams) extends Module {
   }
 
   // ******************************
-  //              DMU
+  //              HFU
   // ******************************
   if (p.useChamp) {
     // ------------------------------
     //             PORT
     // ------------------------------
-    m_dmu.get.io.b_port <> m_pipe.io.b_dmu.get    
+    m_hfu.get.io.b_port <> m_pipe.io.b_hfu.get    
 
     // ------------------------------
     //           DOME STATE
@@ -302,9 +302,9 @@ class Abondance (p: AbondanceParams) extends Module {
       }
     }
 
-    io.b_dome.get <> m_dmu.get.io.b_dome
+    io.b_dome.get <> m_hfu.get.io.b_dome
     for (d <- 0 until p.nDome) {
-      io.b_dome.get(d).flush := m_dmu.get.io.b_dome(d).flush & w_dome_free(d).asUInt.andR
+      io.b_dome.get(d).flush := m_hfu.get.io.b_dome(d).flush & w_dome_free(d).asUInt.andR
     }
 
     for (d <- 0 until p.nDome) {
@@ -315,7 +315,7 @@ class Abondance (p: AbondanceParams) extends Module {
       if (p.useL1D) w_dome_free(d)(4) := m_l1d.get.io.b_dome.get(d).free
       if (p.useL2) w_dome_free(d)(5) := m_l2.get.io.b_dome.get(d).free
       
-      m_dmu.get.io.b_dome(d).free := w_dome_free(d).asUInt.andR & io.b_dome.get(d).free
+      m_hfu.get.io.b_dome(d).free := w_dome_free(d).asUInt.andR & io.b_dome.get(d).free
     }
 
     // ------------------------------
@@ -326,7 +326,7 @@ class Abondance (p: AbondanceParams) extends Module {
     //    EXECUTED DOME PART STATE
     // ------------------------------
     for (pa <- 0 until p.nPart) {
-      m_dmu.get.io.b_pexe.state(pa).free := true.B
+      m_hfu.get.io.b_pexe.state(pa).free := true.B
     }
 
     // ------------------------------
@@ -341,8 +341,8 @@ class Abondance (p: AbondanceParams) extends Module {
     }
 
     for (pa <- 0 until p.nPart) {
-      io.b_pall.get.state(pa) <> m_dmu.get.io.b_pall.state(pa)
-      io.b_pall.get.state(pa).flush := m_dmu.get.io.b_pall.state(pa).flush & w_pall_free(pa).asUInt.andR
+      io.b_pall.get.state(pa) <> m_hfu.get.io.b_pall.state(pa)
+      io.b_pall.get.state(pa).flush := m_hfu.get.io.b_pall.state(pa).flush & w_pall_free(pa).asUInt.andR
     }
     io.b_pall.get.weight := DontCare
 
@@ -351,7 +351,7 @@ class Abondance (p: AbondanceParams) extends Module {
       if (p.useL1D) w_pall_free(pa)(1) := m_l1d.get.io.b_part.get.state(pa).free
       if (p.useL2) w_pall_free(pa)(2) := m_l2.get.io.b_part.get.state(pa).free
 
-      m_dmu.get.io.b_pall.state(pa).free := w_pall_free(pa).asUInt.andR & io.b_pall.get.state(pa).free
+      m_hfu.get.io.b_pall.state(pa).free := w_pall_free(pa).asUInt.andR & io.b_pall.get.state(pa).free
     }
   }
 
@@ -365,7 +365,7 @@ class Abondance (p: AbondanceParams) extends Module {
     io.o_dbg.get.last := m_pipe.io.o_dbg.get.last
     io.o_dbg.get.x := m_pipe.io.o_dbg.get.x
     io.o_dbg.get.csr := m_pipe.io.o_dbg.get.csr
-    if (p.useChamp) io.o_dbg.get.dc.get := m_dmu.get.io.o_dbg.get
+    if (p.useChamp) io.o_dbg.get.hf.get := m_hfu.get.io.o_dbg.get
 
     // ------------------------------
     //         DATA FOOTPRINT

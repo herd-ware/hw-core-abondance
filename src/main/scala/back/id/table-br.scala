@@ -1,10 +1,10 @@
 /*
- * File: table-br.scala                                                        *
+ * File: table-br.scala
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-02-26 09:27:42 am                                       *
- * Modified By: Mathieu Escouteloup                                            *
+ * Last Modified: 2023-02-28 10:46:30 pm
+ * Modified By: Mathieu Escouteloup
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
  * Copyright (c) 2023 HerdWare                                                 *
@@ -18,7 +18,7 @@ package herd.core.abondance.back
 import chisel3._
 import chisel3.util._
 
-import herd.common.isa.base.{INSTR => BASE}
+import herd.common.isa.riscv.{INSTR => RISCV}
 
 
 trait TABLEBR {
@@ -35,14 +35,14 @@ object TABLEBR32I extends TABLEBR {
 
   //                        JAL    Other br
   //                         |         |               
-  BASE.JAL      -> List(    1.B,      0.B),
-  BASE.JALR     -> List(    0.B,      1.B),
-  BASE.BEQ      -> List(    0.B,      1.B),
-  BASE.BNE      -> List(    0.B,      1.B),
-  BASE.BLT      -> List(    0.B,      1.B),
-  BASE.BGE      -> List(    0.B,      1.B),
-  BASE.BLTU     -> List(    0.B,      1.B),
-  BASE.BGEU     -> List(    0.B,      1.B))        
+  RISCV.JAL     -> List(    1.B,      0.B),
+  RISCV.JALR    -> List(    0.B,      1.B),
+  RISCV.BEQ     -> List(    0.B,      1.B),
+  RISCV.BNE     -> List(    0.B,      1.B),
+  RISCV.BLT     -> List(    0.B,      1.B),
+  RISCV.BGE     -> List(    0.B,      1.B),
+  RISCV.BLTU    -> List(    0.B,      1.B),
+  RISCV.BGEU    -> List(    0.B,      1.B))        
 }
 
 object TABLEBRZIFENCEI extends TABLEBR {
@@ -51,5 +51,5 @@ object TABLEBRZIFENCEI extends TABLEBR {
 
   //                        JAL    Other br
   //                         |         |         
-  BASE.FENCEI   -> List(    1.B,      0.B))
+  RISCV.FENCEI  -> List(    1.B,      0.B))
 }

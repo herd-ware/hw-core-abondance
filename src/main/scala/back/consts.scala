@@ -1,10 +1,10 @@
 /*
- * File: consts.scala                                                          *
+ * File: consts.scala
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-02-26 09:28:17 am                                       *
- * Modified By: Mathieu Escouteloup                                            *
+ * Last Modified: 2023-03-01 12:23:34 pm
+ * Modified By: Mathieu Escouteloup
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
  * Copyright (c) 2023 HerdWare                                                 *
@@ -45,5 +45,5 @@ object EXTYPE {
 
   val INT   = 1.U(NBIT.W)
   val LSU   = 2.U(NBIT.W)
-  val DMU   = 3.U(NBIT.W)
+  val HFU   = 3.U(NBIT.W)
 }

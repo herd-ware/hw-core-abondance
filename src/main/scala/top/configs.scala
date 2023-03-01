@@ -1,10 +1,10 @@
 /*
- * File: configs.scala                                                         *
+ * File: configs.scala
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-02-27 05:26:27 pm                                       *
- * Modified By: Mathieu Escouteloup                                            *
+ * Last Modified: 2023-03-01 12:24:21 pm
+ * Modified By: Mathieu Escouteloup
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
  * Copyright (c) 2023 HerdWare                                                 *
@@ -111,7 +111,7 @@ object PipelineConfigBase extends PipelineConfig (
   useSpecLoad = false,
   nStoreQueue = 8,
   nMemQueue = 4,
-  nDmuQueue = 4,
+  nHfuQueue = 4,
 
   nGprPhy = 64,
   nGprReadPhy = 4,
@@ -134,13 +134,14 @@ object AbondanceConfigBase extends AbondanceConfig (
   //            CHAMP
   // ------------------------------
   useChamp = false,
+  nChampReg = 4,
   useChampExtMie = true,
   useChampExtFr = false,
   useChampExtCst = false,
   nChampTrapLvl = 2,
+  
   nDomeFlushCycle = 20,
   nPart = 2,
-  nDomeCfg = 4,
 
   // ------------------------------
   //           FRONT END
@@ -180,7 +181,7 @@ object AbondanceConfigBase extends AbondanceConfig (
   useSpecLoad = false,
   nStoreQueue = 8,
   nMemQueue = 4,
-  nDmuQueue = 4,
+  nHfuQueue = 4,
 
   nGprPhy = 64,
   nGprReadPhy = 4,

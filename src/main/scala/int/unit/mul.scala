@@ -1,10 +1,10 @@
 /*
- * File: mul.scala                                                             *
+ * File: mul.scala
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-02-26 09:30:33 am                                       *
- * Modified By: Mathieu Escouteloup                                            *
+ * Last Modified: 2023-02-28 10:41:55 pm
+ * Modified By: Mathieu Escouteloup
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
  * Copyright (c) 2023 HerdWare                                                 *
@@ -20,7 +20,7 @@ import chisel3.util._
 import scala.math._
 
 import herd.common.gen._
-import herd.common.isa.base._
+import herd.common.isa.riscv._
 import herd.core.abondance.common._
 import herd.core.abondance.back.{BranchBus, BypassBus, GprWriteIO, EndIO}
 

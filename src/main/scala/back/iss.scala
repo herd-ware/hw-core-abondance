@@ -1,10 +1,10 @@
 /*
- * File: iss.scala                                                             *
+ * File: iss.scala
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-02-27 05:25:00 pm                                       *
- * Modified By: Mathieu Escouteloup                                            *
+ * Last Modified: 2023-03-01 12:23:53 pm
+ * Modified By: Mathieu Escouteloup
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
  * Copyright (c) 2023 HerdWare                                                 *
@@ -44,15 +44,15 @@ class IssStage(p: BackParams) extends Module {
 
     val b_int = Vec(p.nBackPort, new GenRVIO(p, new IntQueueBus(p), UInt(0.W)))
     val b_lsu = Vec(p.nBackPort, new GenRVIO(p, new LsuQueueBus(p), UInt(0.W)))
-    val b_dmu = if (p.useChamp) Some(Vec(p.nBackPort, new GenRVIO(p, new ExtReqQueueBus(p, new DmuCtrlBus()), UInt(0.W)))) else None
+    val b_hfu = if (p.useChamp) Some(Vec(p.nBackPort, new GenRVIO(p, new ExtReqQueueBus(p, new HfuCtrlBus()), UInt(0.W)))) else None
   })
 
   val w_wait = Wire(Bool())
   val w_int_wait = Wire(Vec(p.nBackPort, Bool()))
   val w_lsu_wait = Wire(Vec(p.nBackPort, Bool()))
-  val w_dmu_wait = Wire(Vec(p.nBackPort, Bool()))
+  val w_hfu_wait = Wire(Vec(p.nBackPort, Bool()))
 
-  w_wait := w_int_wait.asUInt.orR | w_lsu_wait.asUInt.orR | w_dmu_wait.asUInt.orR
+  w_wait := w_int_wait.asUInt.orR | w_lsu_wait.asUInt.orR | w_hfu_wait.asUInt.orR
 
 
   // ******************************
@@ -193,7 +193,7 @@ class IssStage(p: BackParams) extends Module {
     //             INT
     // ------------------------------
     w_int_wait(bp) := io.b_in(bp).valid & w_back_valid(bp) & ~w_back_flush(bp) & (io.b_in(bp).ctrl.get.ex.ex_type === EXTYPE.INT) & ~io.b_int(bp).ready
-    io.b_int(bp).valid := io.b_in(bp).valid & w_back_valid(bp) & ~w_back_flush(bp) & (io.b_in(bp).ctrl.get.ex.ex_type === EXTYPE.INT) & ~w_lsu_wait.asUInt.orR & ~w_dmu_wait.asUInt.orR
+    io.b_int(bp).valid := io.b_in(bp).valid & w_back_valid(bp) & ~w_back_flush(bp) & (io.b_in(bp).ctrl.get.ex.ex_type === EXTYPE.INT) & ~w_lsu_wait.asUInt.orR & ~w_hfu_wait.asUInt.orR
     io.b_int(bp).ctrl.get.info := io.b_in(bp).ctrl.get.info
     io.b_int(bp).ctrl.get.br := io.b_in(bp).ctrl.get.br
     io.b_int(bp).ctrl.get.br.mask := io.b_in(bp).ctrl.get.br.mask & io.i_br_up
@@ -206,7 +206,7 @@ class IssStage(p: BackParams) extends Module {
     //             LSU
     // ------------------------------
     w_lsu_wait(bp) := io.b_in(bp).valid & w_back_valid(bp) & ~w_back_flush(bp) & (io.b_in(bp).ctrl.get.ex.ex_type === EXTYPE.LSU) & ~io.b_lsu(bp).ready
-    io.b_lsu(bp).valid := io.b_in(bp).valid & w_back_valid(bp) & ~w_back_flush(bp) & (io.b_in(bp).ctrl.get.ex.ex_type === EXTYPE.LSU) & ~w_int_wait.asUInt.orR & ~w_dmu_wait.asUInt.orR
+    io.b_lsu(bp).valid := io.b_in(bp).valid & w_back_valid(bp) & ~w_back_flush(bp) & (io.b_in(bp).ctrl.get.ex.ex_type === EXTYPE.LSU) & ~w_int_wait.asUInt.orR & ~w_hfu_wait.asUInt.orR
     io.b_lsu(bp).ctrl.get.info := io.b_in(bp).ctrl.get.info
     io.b_lsu(bp).ctrl.get.br := io.b_in(bp).ctrl.get.br
     io.b_lsu(bp).ctrl.get.br.mask := io.b_in(bp).ctrl.get.br.mask & io.i_br_up
@@ -216,26 +216,26 @@ class IssStage(p: BackParams) extends Module {
     io.b_lsu(bp).ctrl.get.data := io.b_in(bp).ctrl.get.data
     
     // ------------------------------
-    //             DMU
+    //             HFU
     // ------------------------------
     if (p.useChamp) {
-      w_dmu_wait(bp) := io.b_in(bp).valid & w_back_valid(bp) & ~w_back_flush(bp) & (io.b_in(bp).ctrl.get.ex.ex_type === EXTYPE.DMU) & ~io.b_dmu.get(bp).ready
-      io.b_dmu.get(bp).valid := io.b_in(bp).valid & w_back_valid(bp) & ~w_back_flush(bp) & (io.b_in(bp).ctrl.get.ex.ex_type === EXTYPE.DMU) & ~w_int_wait.asUInt.orR & ~w_lsu_wait.asUInt.orR
-      io.b_dmu.get(bp).ctrl.get.info := io.b_in(bp).ctrl.get.info
-      io.b_dmu.get(bp).ctrl.get.br := io.b_in(bp).ctrl.get.br
-      io.b_dmu.get(bp).ctrl.get.br.mask := io.b_in(bp).ctrl.get.br.mask & io.i_br_up
-      io.b_dmu.get(bp).ctrl.get.dep := w_dep(bp)
-      io.b_dmu.get(bp).ctrl.get.data := io.b_in(bp).ctrl.get.data
-      io.b_dmu.get(bp).ctrl.get.gpr := io.b_in(bp).ctrl.get.ex.gpr
+      w_hfu_wait(bp) := io.b_in(bp).valid & w_back_valid(bp) & ~w_back_flush(bp) & (io.b_in(bp).ctrl.get.ex.ex_type === EXTYPE.HFU) & ~io.b_hfu.get(bp).ready
+      io.b_hfu.get(bp).valid := io.b_in(bp).valid & w_back_valid(bp) & ~w_back_flush(bp) & (io.b_in(bp).ctrl.get.ex.ex_type === EXTYPE.HFU) & ~w_int_wait.asUInt.orR & ~w_lsu_wait.asUInt.orR
+      io.b_hfu.get(bp).ctrl.get.info := io.b_in(bp).ctrl.get.info
+      io.b_hfu.get(bp).ctrl.get.br := io.b_in(bp).ctrl.get.br
+      io.b_hfu.get(bp).ctrl.get.br.mask := io.b_in(bp).ctrl.get.br.mask & io.i_br_up
+      io.b_hfu.get(bp).ctrl.get.dep := w_dep(bp)
+      io.b_hfu.get(bp).ctrl.get.data := io.b_in(bp).ctrl.get.data
+      io.b_hfu.get(bp).ctrl.get.gpr := io.b_in(bp).ctrl.get.ex.gpr
 
-      io.b_dmu.get(bp).ctrl.get.ctrl.code := io.b_in(bp).ctrl.get.ext.code
-      io.b_dmu.get(bp).ctrl.get.ctrl.op1 := io.b_in(bp).ctrl.get.ext.op1
-      io.b_dmu.get(bp).ctrl.get.ctrl.op2 := io.b_in(bp).ctrl.get.ext.op2
-      io.b_dmu.get(bp).ctrl.get.ctrl.op3 := io.b_in(bp).ctrl.get.ext.op3
-      io.b_dmu.get(bp).ctrl.get.ctrl.dcs1 := io.b_in(bp).ctrl.get.ext.rs1
-      io.b_dmu.get(bp).ctrl.get.ctrl.dcs2 := io.b_in(bp).ctrl.get.ext.rs2
+      io.b_hfu.get(bp).ctrl.get.ctrl.code := io.b_in(bp).ctrl.get.ext.code
+      io.b_hfu.get(bp).ctrl.get.ctrl.op1 := io.b_in(bp).ctrl.get.ext.op1
+      io.b_hfu.get(bp).ctrl.get.ctrl.op2 := io.b_in(bp).ctrl.get.ext.op2
+      io.b_hfu.get(bp).ctrl.get.ctrl.op3 := io.b_in(bp).ctrl.get.ext.op3
+      io.b_hfu.get(bp).ctrl.get.ctrl.hfs1 := io.b_in(bp).ctrl.get.ext.rs1
+      io.b_hfu.get(bp).ctrl.get.ctrl.hfs2 := io.b_in(bp).ctrl.get.ext.rs2
     } else {
-      w_dmu_wait(bp) := false.B
+      w_hfu_wait(bp) := false.B
     }
 
     // ******************************
@@ -272,7 +272,7 @@ class IssStage(p: BackParams) extends Module {
     for (bp <- 0 until p.nBackPort) {
       io.b_int(bp).ctrl.get.etd.get := io.b_in(bp).ctrl.get.etd.get
       io.b_lsu(bp).ctrl.get.etd.get := io.b_in(bp).ctrl.get.etd.get
-      if (p.useChamp) io.b_dmu.get(bp).ctrl.get.etd.get := io.b_in(bp).ctrl.get.etd.get
+      if (p.useChamp) io.b_hfu.get(bp).ctrl.get.etd.get := io.b_in(bp).ctrl.get.etd.get
     }
   }
 }

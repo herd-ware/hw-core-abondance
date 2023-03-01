@@ -1,10 +1,10 @@
 /*
- * File: decoder.scala                                                         *
+ * File: decoder.scala
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-02-27 05:20:59 pm                                       *
- * Modified By: Mathieu Escouteloup                                            *
+ * Last Modified: 2023-03-01 12:20:48 pm
+ * Modified By: Mathieu Escouteloup
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
  * Copyright (c) 2023 HerdWare                                                 *
@@ -18,7 +18,7 @@ package herd.core.abondance.back
 import chisel3._
 import chisel3.util._
 
-import herd.common.isa.base.{INSTR => BASE, REG, CBIE}
+import herd.common.isa.riscv.{INSTR => RISCV, REG, CBIE}
 import herd.common.isa.priv.{INSTR => PRIV, EXC => PRIVEXC}
 import herd.common.isa.champ.{INSTR => CHAMP, EXC => CHAMPEXC}
 import herd.core.aubrac.common._
@@ -80,7 +80,7 @@ class Decoder (p: BackParams) extends Module {
 
   // External table
   var t_ext = TABLEEXT32I.table
-  if (p.useChamp)         t_ext ++= TABLEEXTDMU.table
+  if (p.useChamp)         t_ext ++= TABLEEXTHFU.table
 
   // Branch table
   var t_br = TABLEBR32I.table
