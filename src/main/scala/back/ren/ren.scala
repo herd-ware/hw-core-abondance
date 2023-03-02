@@ -3,7 +3,7 @@
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-03-02 12:12:38 pm                                       *
+ * Last Modified: 2023-03-02 06:57:21 pm                                       *
  * Modified By: Mathieu Escouteloup                                            *
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
@@ -106,11 +106,12 @@ class RenStage(p: BackParams) extends Module {
     io.b_rob(bp).data.rdl := Mux(io.b_in(bp).ctrl.get.ex.gpr.en, io.b_in(bp).ctrl.get.data.rdl, 0.U)
     io.b_rob(bp).data.rdp := Mux(io.b_in(bp).ctrl.get.ex.gpr.en, io.b_remap(bp).rdp, 0.U)
 
-    io.b_rob(bp).data.stat.alu := (io.b_in(bp).ctrl.get.ex.ex_type === EXTYPE.INT) & (io.b_in(bp).ctrl.get.ex.int.unit === INTUNIT.ALU)
-    io.b_rob(bp).data.stat.ld := (io.b_in(bp).ctrl.get.ex.ex_type === EXTYPE.LSU) & (io.b_in(bp).ctrl.get.ex.lsu.uop === LSUUOP.R)
-    io.b_rob(bp).data.stat.st := (io.b_in(bp).ctrl.get.ex.ex_type === EXTYPE.LSU) & (io.b_in(bp).ctrl.get.ex.lsu.uop === LSUUOP.W)
-    io.b_rob(bp).data.stat.br := false.B
-    io.b_rob(bp).data.stat.mispred := false.B
+    io.b_rob(bp).data.hpc.instret := false.B
+    io.b_rob(bp).data.hpc.alu := (io.b_in(bp).ctrl.get.ex.ex_type === EXTYPE.INT) & (io.b_in(bp).ctrl.get.ex.int.unit === INTUNIT.ALU)
+    io.b_rob(bp).data.hpc.ld := (io.b_in(bp).ctrl.get.ex.ex_type === EXTYPE.LSU) & (io.b_in(bp).ctrl.get.ex.lsu.uop === LSUUOP.R)
+    io.b_rob(bp).data.hpc.st := (io.b_in(bp).ctrl.get.ex.ex_type === EXTYPE.LSU) & (io.b_in(bp).ctrl.get.ex.lsu.uop === LSUUOP.W)
+    io.b_rob(bp).data.hpc.br := false.B
+    io.b_rob(bp).data.hpc.mispred := false.B
 
     io.b_rob(bp).trap := io.b_in(bp).ctrl.get.trap
     w_wait_rob(bp) := ~io.b_rob(bp).ready

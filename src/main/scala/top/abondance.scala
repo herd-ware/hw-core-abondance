@@ -3,7 +3,7 @@
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-03-02 12:18:40 pm                                       *
+ * Last Modified: 2023-03-02 07:06:44 pm                                       *
  * Modified By: Mathieu Escouteloup                                            *
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
@@ -106,7 +106,7 @@ class Abondance (p: AbondanceParams) extends Module {
   w_l1i_cbo(1) := true.B
 
   if (p.useL1I) {
-    m_pipe.io.b_csr_mem.l1imiss := m_l1i.get.io.o_miss(0)
+    m_pipe.io.i_hpc_mem.l1imiss := m_l1i.get.io.o_miss(0)
 
     if (p.useField) {
       m_l1i.get.io.b_field.get <> m_hfu.get.io.b_field
@@ -123,7 +123,7 @@ class Abondance (p: AbondanceParams) extends Module {
     m_l1i.get.io.b_prev(0) <> m_pipe.io.b_imem
     if (!p.useL2) m_l1i.get.io.b_next <> io.b_imem.get
   } else {
-    m_pipe.io.b_csr_mem.l1imiss := 0.U
+    m_pipe.io.i_hpc_mem.l1imiss := 0.U
     
     m_pipe.io.b_imem <> io.b_imem.get
   }
@@ -150,7 +150,7 @@ class Abondance (p: AbondanceParams) extends Module {
   w_l1d_cbo(1) := true.B
 
   if (p.useL1D) {
-    m_pipe.io.b_csr_mem.l1dmiss := m_l1d.get.io.o_miss(0)
+    m_pipe.io.i_hpc_mem.l1dmiss := m_l1d.get.io.o_miss(0)
 
     if (p.useField) {
       m_l1d.get.io.b_field.get <> m_hfu.get.io.b_field
@@ -178,7 +178,7 @@ class Abondance (p: AbondanceParams) extends Module {
       m_llcross.get.io.b_s(0) <> io.b_dmem.get
     }     
   } else {
-    m_pipe.io.b_csr_mem.l1dmiss := 0.U    
+    m_pipe.io.i_hpc_mem.l1dmiss := 0.U    
   }
 
   // ------------------------------
@@ -190,7 +190,7 @@ class Abondance (p: AbondanceParams) extends Module {
   w_l2_cbo(1) := true.B
 
   if (p.useL2) {
-    m_pipe.io.b_csr_mem.l2miss := m_l2.get.io.o_miss(0)
+    m_pipe.io.i_hpc_mem.l2miss := m_l2.get.io.o_miss(0)
 
     if (p.useField) {
       m_l2.get.io.b_field.get <> m_hfu.get.io.b_field
@@ -259,7 +259,7 @@ class Abondance (p: AbondanceParams) extends Module {
     m_llcross.get.io.b_m(1) <> m_l2.get.io.b_next
     m_llcross.get.io.b_s(0) <> io.b_mem.get
   } else {
-    m_pipe.io.b_csr_mem.l2miss := 0.U
+    m_pipe.io.i_hpc_mem.l2miss := 0.U
   }
   
   // ******************************

@@ -3,7 +3,7 @@
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-02-26 09:29:58 am                                       *
+ * Last Modified: 2023-03-02 07:08:26 pm                                       *
  * Modified By: Mathieu Escouteloup                                            *
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
@@ -20,9 +20,10 @@ import chisel3.util._
 import scala.math._
 
 import herd.common.gen._
+import herd.common.isa.hpc.{HpcInstrBus}
 import herd.core.aubrac.common._
 import herd.core.abondance.common._
-import herd.core.abondance.back.{InfoBus,DependBus,GprCtrlBus,DataExBus,StatBus}
+import herd.core.abondance.back.{InfoBus,DependBus,GprCtrlBus,DataExBus}
 
 
 // ******************************
@@ -81,7 +82,7 @@ class ExtReqCtrlBus[UC <: Data](p: ExUnitParams, uc: UC) extends Bundle {
 
 class ExtAckCtrlBus[UC <: Data](p: ExUnitParams, uc: UC) extends Bundle {
   val trap = Output(new TrapBus(p.nAddrBit, p.nDataBit))
-  val stat = Output(new StatBus())
+  val hpc = Output(new HpcInstrBus())
 
   val etd = if (p.debug) Some(new EtdBus(p.nHart, p.nAddrBit, p.nInstrBit)) else None
 }

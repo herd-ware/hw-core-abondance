@@ -3,7 +3,7 @@
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-03-02 12:13:02 pm                                       *
+ * Last Modified: 2023-03-02 06:37:55 pm                                       *
  * Modified By: Mathieu Escouteloup                                            *
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
@@ -21,7 +21,7 @@ import chisel3.util._
 import herd.common.gen._
 import herd.common.field._
 import herd.common.isa.riscv._
-import herd.common.isa.count.{CsrBus => CountBus}
+import herd.common.isa.hpc.{HpcPipelineBus}
 import herd.core.aubrac.common._
 import herd.core.aubrac.front.{FrontBus}
 import herd.core.abondance.common._
@@ -58,7 +58,7 @@ class Back (p: BackParams) extends Module {
 
     val b_clint = Flipped(new ClintIO(p.nDataBit))
 
-    val o_stat = Output(new CountBus())
+    val o_hpc = Output(new HpcPipelineBus())
 
     val b_int = Vec(p.nBackPort, new GenRVIO(p, new IntQueueBus(p), UInt(0.W)))
     val b_lsu = Vec(p.nBackPort, new GenRVIO(p, new LsuQueueBus(p), UInt(0.W)))
@@ -166,7 +166,7 @@ class Back (p: BackParams) extends Module {
   io.o_busy := io.i_byp
   io.o_trap := m_rob.io.o_trap
 
-  io.o_stat := m_rob.io.o_stat
+  io.o_hpc := m_rob.io.o_hpc
 
   // ******************************
   //             FIELD

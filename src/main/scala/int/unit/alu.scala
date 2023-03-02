@@ -1,10 +1,10 @@
 /*
- * File: alu.scala
+ * File: alu.scala                                                             *
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-02-28 10:41:50 pm
- * Modified By: Mathieu Escouteloup
+ * Last Modified: 2023-03-02 06:59:37 pm                                       *
+ * Modified By: Mathieu Escouteloup                                            *
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
  * Copyright (c) 2023 HerdWare                                                 *
@@ -338,7 +338,7 @@ class Alu (p: IntUnitParams) extends Module {
   io.b_end.replay := false.B
   io.b_end.trap := DontCare
   io.b_end.trap.valid := false.B
-  io.b_end.stat := 0.U.asTypeOf(io.b_end.stat)
+  io.b_end.hpc := 0.U.asTypeOf(io.b_end.hpc)
 
   // ******************************
   //             FREE

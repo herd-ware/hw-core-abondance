@@ -3,7 +3,7 @@
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-03-02 12:17:30 pm                                       *
+ * Last Modified: 2023-03-02 07:13:48 pm                                       *
  * Modified By: Mathieu Escouteloup                                            *
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
@@ -453,7 +453,7 @@ class LoadQueue(p: LsuParams) extends Module {
     io.b_end(l).trap := DontCare
     io.b_end(l).trap.valid := false.B
 
-    io.b_end(l).stat := 0.U.asTypeOf(io.b_end(l).stat)
+    io.b_end(l).hpc := 0.U.asTypeOf(io.b_end(l).hpc)
   }
 
   // ******************************

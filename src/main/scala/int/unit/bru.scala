@@ -3,7 +3,7 @@
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-02-26 09:30:21 am                                       *
+ * Last Modified: 2023-03-02 07:00:43 pm                                       *
  * Modified By: Mathieu Escouteloup                                            *
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
@@ -20,9 +20,10 @@ import chisel3.util._
 import chisel3.experimental.ChiselEnum
 
 import herd.common.gen._
+import herd.common.isa.hpc.{HpcInstrBus}
 import herd.common.mem.cbo.{CboIO, CboBus, OP => CBOOP, SORT => CBOSORT, BLOCK => CBOBLOCK}
 import herd.core.abondance.common._
-import herd.core.abondance.back.{BranchBus, StatBus, GprWriteIO, EndIO}
+import herd.core.abondance.back.{BranchBus, GprWriteIO, EndIO}
 import herd.core.aubrac.nlp.{BranchInfoBus}
 
 
@@ -311,17 +312,17 @@ class Bru (p: IntUnitParams) extends Module {
   init_br_new := DontCare
   init_br_new.valid := false.B
 
-  val init_stat = Wire(new StatBus())
+  val init_hpc = Wire(new HpcInstrBus())
 
-  init_stat := 0.U.asTypeOf(init_stat)
-  init_stat.br := false.B
-  init_stat.mispred := false.B
+  init_hpc := 0.U.asTypeOf(init_hpc)
+  init_hpc.br := false.B
+  init_hpc.mispred := false.B
 
   val r_out = RegInit(init_out)
   val r_flush_pipe = RegInit(false.B)
   val r_br_new = RegInit(init_br_new)
   val r_br_up = RegInit(VecInit(Seq.fill(p.nSpecBranch)(false.B)))
-  val r_stat = RegInit(init_stat)
+  val r_hpc = RegInit(init_hpc)
   
   // Connect
   io.b_in.ready := ~w_lock & (r_fsm === s0IDLE)
@@ -345,8 +346,8 @@ class Bru (p: IntUnitParams) extends Module {
           r_br_up(sp) := ~(io.b_in.valid & w_use_tag & (sp.U === io.b_in.ctrl.get.br.tag))
         }
 
-        r_stat.br := io.b_in.valid & (w_jal | w_jalr | w_br)
-        r_stat.mispred := w_redirect
+        r_hpc.br := io.b_in.valid & (w_jal | w_jalr | w_br)
+        r_hpc.mispred := w_redirect
       }.otherwise {
         r_out.ctrl.get.br.mask := r_out.ctrl.get.br.mask & io.i_br_up
       }
@@ -386,7 +387,7 @@ class Bru (p: IntUnitParams) extends Module {
   io.b_end.trap := DontCare
   io.b_end.trap.valid := false.B
 
-  io.b_end.stat := r_stat
+  io.b_end.hpc := r_hpc
 
   io.o_br_up := r_br_up.asUInt
   io.o_br_new := r_br_new

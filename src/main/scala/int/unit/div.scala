@@ -3,7 +3,7 @@
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-02-26 09:30:27 am                                       *
+ * Last Modified: 2023-03-02 07:12:57 pm                                       *
  * Modified By: Mathieu Escouteloup                                            *
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
@@ -288,7 +288,7 @@ class Div (p: IntUnitParams) extends Module {
   io.b_end.trap := DontCare
   io.b_end.trap.valid := false.B
   
-  io.b_end.stat := 0.U.asTypeOf(io.b_end.stat)
+  io.b_end.hpc := 0.U.asTypeOf(io.b_end.hpc)
 
   // ******************************
   //             FREE

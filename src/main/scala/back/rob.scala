@@ -3,7 +3,7 @@
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-03-02 12:13:33 pm                                       *
+ * Last Modified: 2023-03-02 07:03:54 pm                                       *
  * Modified By: Mathieu Escouteloup                                            *
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
@@ -19,7 +19,7 @@ import chisel3._
 import chisel3.util._
 
 import herd.common.isa.riscv._
-import herd.common.isa.count.{CsrBus => CountBus}
+import herd.common.isa.hpc.{HpcInstrBus, HpcPipelineBus}
 import herd.common.field._
 import herd.core.aubrac.common.{TrapBus,EtdBus}
 import herd.core.aubrac.common.{TRAPSRC}
@@ -45,7 +45,7 @@ class Rob(p: BackParams) extends Module {
     val o_commit = Output(Vec(p.nCommit, new CommitBus(p.nRobEntry, p.nGprLog, p.nGprPhy)))
     val o_trap = Output(new TrapBus(p.nAddrBit, p.nDataBit))
 
-    val o_stat = Output(new CountBus())
+    val o_hpc = Output(new HpcPipelineBus())
 
     val o_dbg = if (p.debug) Some(Output(UInt(p.nAddrBit.W))) else None
     val o_etd = if (p.debug) Some(Output(Vec(p.nCommit, new EtdBus(p.nHart, p.nAddrBit, p.nInstrBit)))) else None
@@ -136,8 +136,8 @@ class Rob(p: BackParams) extends Module {
         } else {
           r_entry(re).replay := false.B
         }
-        r_entry(re).stat.br := io.b_end(eu).stat.br
-        r_entry(re).stat.mispred := io.b_end(eu).stat.mispred
+        r_entry(re).hpc.br := io.b_end(eu).hpc.br
+        r_entry(re).hpc.mispred := io.b_end(eu).hpc.mispred
       }
     }
   }
@@ -213,32 +213,32 @@ class Rob(p: BackParams) extends Module {
     w_cpt_slct := w_cpt(PriorityEncoder(~w_cready.asUInt))
   }
 
-  // ------------------------------
-  //             STATS
-  // ------------------------------
-  val w_cinstret = Wire(Vec(p.nCommit, Bool()))
-  val w_calu = Wire(Vec(p.nCommit, Bool()))
-  val w_cld = Wire(Vec(p.nCommit, Bool()))
-  val w_cst = Wire(Vec(p.nCommit, Bool()))
-  val w_cbr = Wire(Vec(p.nCommit, Bool()))
-  val w_cmispred = Wire(Vec(p.nCommit, Bool()))
+  // ******************************
+  //              HPC
+  // ******************************
+  val w_hpc_instret = Wire(Vec(p.nCommit, Bool()))
+  val w_hpc_alu = Wire(Vec(p.nCommit, Bool()))
+  val w_hpc_ld = Wire(Vec(p.nCommit, Bool()))
+  val w_hpc_st = Wire(Vec(p.nCommit, Bool()))
+  val w_hpc_br = Wire(Vec(p.nCommit, Bool()))
+  val w_hpc_mispred = Wire(Vec(p.nCommit, Bool()))
 
   for (c <- 0 until p.nCommit) {
-    w_cinstret(c) := w_cready(c) & r_entry(w_cpt(c)).valid & ~r_entry(w_cpt(c)).exc
-    w_calu(c) := w_cready(c) & r_entry(w_cpt(c)).valid & r_entry(w_cpt(c)).stat.alu
-    w_cld(c) := w_cready(c) & r_entry(w_cpt(c)).valid & r_entry(w_cpt(c)).stat.ld
-    w_cst(c) := w_cready(c) & r_entry(w_cpt(c)).valid & r_entry(w_cpt(c)).stat.st
-    w_cbr(c) := w_cready(c) & r_entry(w_cpt(c)).valid & r_entry(w_cpt(c)).stat.br
-    w_cmispred(c) := w_cready(c) & r_entry(w_cpt(c)).valid & r_entry(w_cpt(c)).stat.mispred
+    w_hpc_instret(c) := w_cready(c) & r_entry(w_cpt(c)).valid & ~r_entry(w_cpt(c)).exc
+    w_hpc_alu(c) := w_cready(c) & r_entry(w_cpt(c)).valid & r_entry(w_cpt(c)).hpc.alu
+    w_hpc_ld(c) := w_cready(c) & r_entry(w_cpt(c)).valid & r_entry(w_cpt(c)).hpc.ld
+    w_hpc_st(c) := w_cready(c) & r_entry(w_cpt(c)).valid & r_entry(w_cpt(c)).hpc.st
+    w_hpc_br(c) := w_cready(c) & r_entry(w_cpt(c)).valid & r_entry(w_cpt(c)).hpc.br
+    w_hpc_mispred(c) := w_cready(c) & r_entry(w_cpt(c)).valid & r_entry(w_cpt(c)).hpc.mispred
   }
 
-  io.o_stat := 0.U.asTypeOf(io.o_stat)
-  io.o_stat.instret := PopCount(w_cready.asUInt)
-  io.o_stat.alu := PopCount(w_calu.asUInt)
-  io.o_stat.ld := PopCount(w_cld.asUInt)
-  io.o_stat.st := PopCount(w_cst.asUInt)
-  io.o_stat.br := PopCount(w_cbr.asUInt)
-  io.o_stat.mispred := PopCount(w_cmispred.asUInt)
+  io.o_hpc := 0.U.asTypeOf(io.o_hpc)
+  io.o_hpc.instret := PopCount(w_hpc_instret.asUInt)
+  io.o_hpc.alu := PopCount(w_hpc_alu.asUInt)
+  io.o_hpc.ld := PopCount(w_hpc_ld.asUInt)
+  io.o_hpc.st := PopCount(w_hpc_st.asUInt)
+  io.o_hpc.br := PopCount(w_hpc_br.asUInt)
+  io.o_hpc.mispred := PopCount(w_hpc_mispred.asUInt)
 
   // ******************************
   //              PT

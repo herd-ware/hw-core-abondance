@@ -1,10 +1,10 @@
 /*
- * File: bus.scala
+ * File: bus.scala                                                             *
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-03-01 12:23:24 pm
- * Modified By: Mathieu Escouteloup
+ * Last Modified: 2023-03-02 06:55:55 pm                                       *
+ * Modified By: Mathieu Escouteloup                                            *
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
  * Copyright (c) 2023 HerdWare                                                 *
@@ -19,6 +19,7 @@ import chisel3._
 import chisel3.util._
 
 import herd.common.gen._
+import herd.common.isa.hpc.{HpcInstrBus}
 import herd.core.aubrac.common.{TrapBus, EtdBus}
 import herd.core.aubrac.back.{OP, IMM}
 import herd.core.aubrac.hfu.{CODE => HFUCODE, OP => HFUOP}
@@ -186,14 +187,6 @@ class BypassBus(nDataBit: Int, nGprPhy: Int) extends Bundle {
 // ******************************
 //             ROB
 // ******************************
-class StatBus extends Bundle {
-  val alu = Bool()
-  val ld = Bool()
-  val st = Bool()
-  val br = Bool()
-  val mispred = Bool()
-}
-
 class RobEntryBus (p: BackParams) extends Bundle {
   val valid = Bool()
 
@@ -205,7 +198,7 @@ class RobEntryBus (p: BackParams) extends Bundle {
   val rdl = UInt(log2Ceil(p.nGprLog).W)
   val rdp = UInt(log2Ceil(p.nGprPhy).W)
 
-  val stat = new StatBus()
+  val hpc = new HpcInstrBus()
 
   val etd = if (p.debug) Some(new EtdBus(p.nHart, p.nAddrBit, p.nInstrBit)) else None
 }
@@ -232,7 +225,7 @@ class EndIO (debug: Boolean, nAddrBit: Int, nDataBit: Int, nRobEntry: Int) exten
   val replay = Output(Bool())
   val trap = Output(new TrapBus(nAddrBit, nDataBit))
   
-  val stat = Output(new StatBus())
+  val hpc = Output(new HpcInstrBus())
 
   val etd = if (debug) Some(Output(new EtdBus(1, nAddrBit, 0))) else None
 }

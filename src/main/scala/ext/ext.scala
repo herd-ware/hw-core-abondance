@@ -3,7 +3,7 @@
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-03-02 12:13:59 pm                                       *
+ * Last Modified: 2023-03-02 07:08:42 pm                                       *
  * Modified By: Mathieu Escouteloup                                            *
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
@@ -126,7 +126,7 @@ class Ext[UC <: Data](p: ExUnitParams, uc: UC, nBus: Int, nReqQueue: Int, nAckQu
     io.b_end(b).entry := m_ack.io.b_out(b).ctrl.get.info.entry
     io.b_end(b).replay := false.B
     io.b_end(b).trap := io.b_port.ack(b).ctrl.get.trap
-    io.b_end(b).stat := io.b_port.ack(b).ctrl.get.stat
+    io.b_end(b).hpc := io.b_port.ack(b).ctrl.get.hpc
   }
 
   // ******************************
