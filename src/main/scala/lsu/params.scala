@@ -31,8 +31,8 @@ trait LsuParams extends ExUnitParams {
   def nDataBit: Int
 
   def useChamp: Boolean
-  def nDome: Int
-  def multiDome: Boolean = false
+  def nField: Int
+  def multiField: Boolean = false
   def nPart: Int
 
   def nBackPort: Int
@@ -59,9 +59,9 @@ trait LsuParams extends ExUnitParams {
     useAmo = useExtA,
     nDataByte = nDataByte,
     
-    useDome = useDome,
-    nDome = nDome,
-    multiDome = false
+    useField = useField,
+    nField = nField,
+    multiField = false
   )
 
   def pL0D1Bus: Mb4sParams = new Mb4sConfig (
@@ -72,9 +72,9 @@ trait LsuParams extends ExUnitParams {
     useAmo = useExtA,
     nDataByte = nDataByte,
     
-    useDome = useDome,
-    nDome = nDome,
-    multiDome = false
+    useField = useField,
+    nField = nField,
+    multiField = false
   )
 }
 
@@ -84,7 +84,7 @@ case class LsuConfig (
   nDataBit: Int,
 
   useChamp: Boolean,
-  nDome: Int,
+  nField: Int,
   nPart: Int,
 
   nBackPort: Int,

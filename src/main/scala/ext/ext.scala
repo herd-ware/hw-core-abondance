@@ -3,7 +3,7 @@
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-02-26 09:30:01 am                                       *
+ * Last Modified: 2023-03-02 12:13:59 pm                                       *
  * Modified By: Mathieu Escouteloup                                            *
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
@@ -19,7 +19,7 @@ import chisel3._
 import chisel3.util._
 
 import herd.common.gen._
-import herd.common.dome._
+import herd.common.field._
 import herd.core.abondance.common._
 import herd.core.abondance.back.{BranchBus, BypassBus, CommitBus, GprReadIO, GprWriteIO, RobPcIO, EndIO}
 import herd.core.abondance.back.{BackConfigBase}
@@ -27,7 +27,7 @@ import herd.core.abondance.back.{BackConfigBase}
 
 class Ext[UC <: Data](p: ExUnitParams, uc: UC, nBus: Int, nReqQueue: Int, nAckQueue: Int) extends Module {  
   val io = IO(new Bundle {
-    val b_unit = if (p.useDome) Some(new RsrcIO(p.nHart, p.nDome, 1)) else None
+    val b_unit = if (p.useField) Some(new RsrcIO(p.nHart, p.nField, 1)) else None
 
     val i_flush = Input(Bool())
 
@@ -56,7 +56,7 @@ class Ext[UC <: Data](p: ExUnitParams, uc: UC, nBus: Int, nReqQueue: Int, nAckQu
   // ******************************
   //           REQ QUEUE
   // ******************************
-  if (p.useDome) m_req.io.b_unit.get <> io.b_unit.get
+  if (p.useField) m_req.io.b_unit.get <> io.b_unit.get
   m_req.io.i_flush := io.i_flush
 
   m_req.io.b_in <> io.b_in
@@ -68,7 +68,7 @@ class Ext[UC <: Data](p: ExUnitParams, uc: UC, nBus: Int, nReqQueue: Int, nAckQu
   // ******************************
   //              RR
   // ******************************
-  if (p.useDome) m_rr.io.b_unit.get <> io.b_unit.get
+  if (p.useField) m_rr.io.b_unit.get <> io.b_unit.get
   m_rr.io.i_flush := io.i_flush
 
   m_rr.io.b_in <> m_req.io.b_out
@@ -100,7 +100,7 @@ class Ext[UC <: Data](p: ExUnitParams, uc: UC, nBus: Int, nReqQueue: Int, nAckQu
   // ******************************
   //             ACK
   // ******************************
-  if (p.useDome) m_ack.io.b_unit.get <> io.b_unit.get
+  if (p.useField) m_ack.io.b_unit.get <> io.b_unit.get
   m_ack.io.i_flush := io.i_flush
 
   m_ack.io.i_run := io.i_run
@@ -130,9 +130,9 @@ class Ext[UC <: Data](p: ExUnitParams, uc: UC, nBus: Int, nReqQueue: Int, nAckQu
   }
 
   // ******************************
-  //             DOME
+  //             FIELD
   // ******************************
-  if (p.useDome) {
+  if (p.useField) {
     io.b_unit.get.free := m_req.io.b_unit.get.free & m_rr.io.b_unit.get.free & m_ack.io.b_unit.get.free
   }
 

@@ -33,9 +33,9 @@ trait ExUnitParams extends GenParams {
   def nInstrBit: Int = 32
 
   def useChamp: Boolean
-  def useDome: Boolean = useChamp
-  def nDome: Int
-  def multiDome: Boolean
+  def useField: Boolean = useChamp
+  def nField: Int
+  def multiField: Boolean
   def nPart: Int
 
   def nBackPort: Int

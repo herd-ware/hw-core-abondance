@@ -3,7 +3,7 @@
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-02-26 09:28:02 am                                       *
+ * Last Modified: 2023-03-02 12:12:38 pm                                       *
  * Modified By: Mathieu Escouteloup                                            *
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
@@ -19,7 +19,7 @@ import chisel3._
 import chisel3.util._
 
 import herd.common.gen._
-import herd.common.dome._
+import herd.common.field._
 import herd.common.mem.mb4s.{OP => LSUUOP}
 import herd.core.aubrac.back.{SlctImm}
 import herd.core.abondance.common._
@@ -28,7 +28,7 @@ import herd.core.abondance.int.{INTUNIT}
 
 class RenStage(p: BackParams) extends Module {
   val io = IO(new Bundle {
-    val b_back = if (p.useDome) Some(Vec(p.nBackPort, new RsrcIO(p.nHart, p.nDome, 1))) else None
+    val b_back = if (p.useField) Some(Vec(p.nBackPort, new RsrcIO(p.nHart, p.nField, 1))) else None
 
     val i_flush = Input(Bool())
 
@@ -58,7 +58,7 @@ class RenStage(p: BackParams) extends Module {
   val w_back_flush = Wire(Vec(p.nBackPort, Bool()))
 
   for (bp <- 0 until p.nBackPort) {
-    if (p.useDome) {
+    if (p.useField) {
       w_back_valid(bp) := io.b_back.get(bp).valid & ~io.b_back.get(bp).flush
       w_back_flush(bp) := io.b_back.get(bp).flush
     } else {
@@ -175,9 +175,9 @@ class RenStage(p: BackParams) extends Module {
   }
 
   // ******************************
-  //             DOME
+  //             FIELD
   // ******************************
-  if (p.useDome) {
+  if (p.useField) {
     for (bp <- 0 until p.nBackPort) { 
       io.b_back.get(bp).free := ~m_out(bp).io.o_val.valid    
     }

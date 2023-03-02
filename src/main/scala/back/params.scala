@@ -28,8 +28,8 @@ trait BackParams extends ExUnitParams {
   def nDataBit: Int
 
   def useChamp: Boolean
-  def nDome: Int
-  def multiDome: Boolean = false
+  def nField: Int
+  def multiField: Boolean = false
   def nPart: Int
 
   def useFastJal: Boolean
@@ -64,7 +64,7 @@ case class BackConfig (
   nDataBit: Int,
 
   useChamp: Boolean,
-  nDome: Int,
+  nField: Int,
   nPart: Int,
 
   useFastJal: Boolean,

@@ -32,8 +32,8 @@ trait IntUnitParams extends ExUnitParams {
   def nDataBit: Int
 
   def useChamp: Boolean
-  def nDome: Int
-  def multiDome: Boolean = false
+  def nField: Int
+  def multiField: Boolean = false
   def nPart: Int
   
   def useFastJal: Boolean
@@ -78,7 +78,7 @@ case class IntUnitConfig (
   nDataBit: Int,
 
   useChamp: Boolean,
-  nDome: Int,
+  nField: Int,
   nPart: Int,
 
   useFastJal: Boolean,
@@ -111,8 +111,8 @@ trait IntParams extends ExUnitParams {
   def nDataBit: Int
 
   def useChamp: Boolean
-  def nDome: Int
-  def multiDome: Boolean = false
+  def nField: Int
+  def multiField: Boolean = false
   def nPart: Int
 
   def useFastJal: Boolean
@@ -140,7 +140,7 @@ trait IntParams extends ExUnitParams {
         nCommit = nCommit,
         nGprPhy = nGprPhy,
         useChamp = useChamp,
-        nDome = nDome,
+        nField = nField,
         nPart = nPart,
         iIntUnit = iIntUnit(nu)
       )
@@ -231,7 +231,7 @@ case class IntConfig (
   nDataBit: Int,
 
   useChamp: Boolean,
-  nDome: Int,
+  nField: Int,
   nPart: Int,
 
   useFastJal: Boolean,

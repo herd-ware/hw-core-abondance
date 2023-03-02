@@ -3,7 +3,7 @@
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-02-26 09:30:11 am                                       *
+ * Last Modified: 2023-03-02 12:14:14 pm                                       *
  * Modified By: Mathieu Escouteloup                                            *
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
@@ -19,7 +19,7 @@ import chisel3._
 import chisel3.util._
 
 import herd.common.gen._
-import herd.common.dome._
+import herd.common.field._
 import herd.core.abondance.common._
 import herd.core.aubrac.back.{OP}
 import herd.core.abondance.back.{BranchBus, CommitBus, GprReadIO, RobPcIO}
@@ -28,7 +28,7 @@ import herd.core.abondance.back.{BackConfigBase}
 
 class ExtRrStage[UC <: Data](p: ExUnitParams, uc: UC, nBus: Int) extends Module {  
   val io = IO(new Bundle {
-    val b_unit = if (p.useDome) Some(new RsrcIO(p.nHart, p.nDome, 1)) else None
+    val b_unit = if (p.useField) Some(new RsrcIO(p.nHart, p.nField, 1)) else None
 
     val i_flush = Input(Bool())
 
@@ -55,7 +55,7 @@ class ExtRrStage[UC <: Data](p: ExUnitParams, uc: UC, nBus: Int) extends Module 
   // ******************************
   val w_unit_flush = Wire(Bool())
 
-  if (p.useDome) {
+  if (p.useField) {
     w_unit_flush := io.b_unit.get.flush
   } else {
     w_unit_flush := false.B
@@ -165,9 +165,9 @@ class ExtRrStage[UC <: Data](p: ExUnitParams, uc: UC, nBus: Int) extends Module 
   }
 
   // ******************************
-  //             DOME
+  //             FIELD
   // ******************************
-  if (p.useDome) {
+  if (p.useField) {
     val w_unit_free = Wire(Vec(nBus, Bool()))
 
     for (b <- 0 until nBus) {

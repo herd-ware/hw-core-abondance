@@ -1,10 +1,10 @@
 /*
- * File: rob.scala
+ * File: rob.scala                                                             *
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-02-28 10:41:43 pm
- * Modified By: Mathieu Escouteloup
+ * Last Modified: 2023-03-02 12:13:33 pm                                       *
+ * Modified By: Mathieu Escouteloup                                            *
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
  * Copyright (c) 2023 HerdWare                                                 *
@@ -20,7 +20,7 @@ import chisel3.util._
 
 import herd.common.isa.riscv._
 import herd.common.isa.count.{CsrBus => CountBus}
-import herd.common.dome._
+import herd.common.field._
 import herd.core.aubrac.common.{TrapBus,EtdBus}
 import herd.core.aubrac.common.{TRAPSRC}
 import herd.core.abondance.common._
@@ -29,7 +29,7 @@ import herd.io.core.clint.{ClintIO}
 
 class Rob(p: BackParams) extends Module {
   val io = IO(new Bundle {
-    val b_hart = if (p.useDome) Some(new RsrcIO(p.nHart, p.nDome, 1)) else None
+    val b_hart = if (p.useField) Some(new RsrcIO(p.nHart, p.nField, 1)) else None
 
     val b_write = Vec(p.nBackPort, new RobWriteIO(p))
 
@@ -72,7 +72,7 @@ class Rob(p: BackParams) extends Module {
   // ******************************
   val w_hart_flush = Wire(Bool())
 
-  if (p.useDome) {
+  if (p.useField) {
     w_hart_flush := io.b_hart.get.flush
   } else {
     w_hart_flush := false.B
@@ -511,9 +511,9 @@ class Rob(p: BackParams) extends Module {
   }
 
   // ******************************
-  //             DOME
+  //             FIELD
   // ******************************
-  if (p.useDome) {
+  if (p.useField) {
     io.b_hart.get.free := true.B
 
     when (io.b_hart.get.flush) {

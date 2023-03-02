@@ -18,7 +18,7 @@ package herd.core.abondance
 import chisel3._
 import chisel3.util._
 
-import herd.common.dome._
+import herd.common.field._
 import herd.common.mem.mb4s._
 import herd.common.mem.cbo._
 import herd.core.aubrac.common._
@@ -37,14 +37,14 @@ import herd.io.core.clint.{ClintIO}
 
 class Pipeline (p: PipelineParams) extends Module {
   val io = IO(new Bundle {
-    val b_dome = if (p.useDome) Some(Vec(p.nDome, new DomeIO(p.nAddrBit, p.nDataBit))) else None
-    val b_hart = if (p.useDome) Some(new RsrcIO(p.nHart, p.nDome, 1)) else None
+    val b_field = if (p.useField) Some(Vec(p.nField, new FieldIO(p.nAddrBit, p.nDataBit))) else None
+    val b_hart = if (p.useField) Some(new RsrcIO(p.nHart, p.nField, 1)) else None
 
     val b_imem = new Mb4sIO(p.pL0IBus)
 
     val b_d0mem = new Mb4sIO(p.pL0D0Bus)
     val b_d1mem = new Mb4sIO(p.pL0D1Bus)    
-    val b_cbo = if (p.useCbo) Some(new CboIO(1, p.useDome, p.nDome, p.nAddrBit)) else None
+    val b_cbo = if (p.useCbo) Some(new CboIO(1, p.useField, p.nField, p.nAddrBit)) else None
 
     val b_hfu = if (p.useChamp) Some(Flipped(new HfuIO(p, p.nAddrBit, p.nDataBit, p.nChampTrapLvl))) else None
     val b_csr_mem = new CsrMemIO()
@@ -81,7 +81,7 @@ class Pipeline (p: PipelineParams) extends Module {
   //          FRONT & NLP
   // ******************************
   if (p.useNlp) {    
-    if (p.useDome) m_nlp.get.io.b_hart.get <> io.b_hart.get
+    if (p.useField) m_nlp.get.io.b_hart.get <> io.b_hart.get
     if (p.useFastJal) {
       m_nlp.get.io.i_mispred := w_br_new.valid | m_front.io.o_br_new.get.valid
     } else {
@@ -91,10 +91,10 @@ class Pipeline (p: PipelineParams) extends Module {
     m_nlp.get.io.i_info := m_int.io.o_br_info
   }
   
-  if (p.useDome) {
+  if (p.useField) {
     m_front.io.b_hart.get <> io.b_hart.get
     m_front.io.i_flush := m_back.io.o_flush | m_back.io.o_init | m_int.io.o_flush | m_csr.io.o_br_trap(0).valid | io.b_hfu.get.ctrl.pipe_flush
-    m_front.io.i_br_dome.get := io.b_hfu.get.ctrl.pipe_br
+    m_front.io.i_br_field.get := io.b_hfu.get.ctrl.pipe_br
   } else {
     m_front.io.i_flush := m_back.io.o_flush | m_back.io.o_init | m_int.io.o_flush | m_csr.io.o_br_trap(0).valid
   }
@@ -105,7 +105,7 @@ class Pipeline (p: PipelineParams) extends Module {
   // ******************************
   //             BACK
   // ******************************
-  if (p.useDome) {
+  if (p.useField) {
     m_back.io.b_hart.get <> io.b_hart.get
     for (bp <- 0 until p.nBackPort) {
       m_back.io.b_back.get(bp) <> io.b_hart.get
@@ -180,7 +180,7 @@ class Pipeline (p: PipelineParams) extends Module {
   // ******************************
   //             INT
   // ******************************
-  if (p.useDome) {
+  if (p.useField) {
     m_int.io.b_hart.get <> io.b_hart.get
     m_int.io.b_unit.get <> io.b_hart.get
     m_int.io.i_flush := m_back.io.o_init | io.b_hfu.get.ctrl.pipe_flush
@@ -197,7 +197,7 @@ class Pipeline (p: PipelineParams) extends Module {
   // ******************************
   //             LSU
   // ******************************
-  if (p.useDome) {
+  if (p.useField) {
     m_lsu.io.b_hart.get <> io.b_hart.get
     m_lsu.io.i_flush := m_back.io.o_init | io.b_hfu.get.ctrl.pipe_flush
   } else {
@@ -259,8 +259,8 @@ class Pipeline (p: PipelineParams) extends Module {
   // ******************************
   //             CSR
   // ******************************
-  if (p.useDome) {
-    m_csr.io.b_dome.get <> io.b_dome.get
+  if (p.useField) {
+    m_csr.io.b_field.get <> io.b_field.get
     m_csr.io.b_hart.get(0) <> io.b_hart.get
   }
 
@@ -274,9 +274,9 @@ class Pipeline (p: PipelineParams) extends Module {
   m_csr.io.b_clint(0) <> io.b_clint
   
   // ******************************
-  //             DOME
+  //            FIELD
   // ******************************
-  if (p.useDome) {
+  if (p.useField) {
     val w_back_free = Wire(Vec(p.nBackPort, Bool()))
     val w_hart_free = Wire(Vec(9, Bool()))
 

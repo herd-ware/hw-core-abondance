@@ -27,7 +27,7 @@ object LsuConfigBase extends LsuConfig (
   nDataBit = 32,
 
   useChamp = false,
-  nDome = 1,
+  nField = 1,
   nPart = 1,
 
   nBackPort = 2,

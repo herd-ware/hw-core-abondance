@@ -38,7 +38,7 @@ class Bru (p: IntUnitParams) extends Module {
     val i_flush = Input(Bool())
     val o_free = Output(Bool())
 
-    val i_dome = if (p.useDome) Some(Input(UInt(log2Ceil(p.nDome).W))) else None
+    val i_field = if (p.useField) Some(Input(UInt(log2Ceil(p.nField).W))) else None
     val b_in = Flipped(new GenRVIO(p, new IntUnitCtrlBus(p), new IntUnitDataBus(p)))
 
     val i_br_up = Input(UInt(p.nSpecBranch.W))
@@ -51,10 +51,10 @@ class Bru (p: IntUnitParams) extends Module {
     val o_br_new = Output(new BranchBus(p.nAddrBit, p.nSpecBranch, p.nRobEntry))
     val o_br_info = Output(new BranchInfoBus(p.nAddrBit))
     val o_flush = Output(Bool())
-    val b_cbo = if (p.useCbo) Some(new CboIO(1, p.useDome, p.nDome, p.nAddrBit)) else None
+    val b_cbo = if (p.useCbo) Some(new CboIO(1, p.useField, p.nField, p.nAddrBit)) else None
   })
 
-  val init_cbo = Wire(new CboBus(p.nHart, p.useDome, p.nDome, p.nAddrBit))
+  val init_cbo = Wire(new CboBus(p.nHart, p.useField, p.nField, p.nAddrBit))
 
   if (p.useExtZicbo) {
     init_cbo := DontCare
@@ -98,7 +98,7 @@ class Bru (p: IntUnitParams) extends Module {
               r_cbo.valid := true.B
               r_cbo.ready := false.B
               r_cbo.hart := 0.U
-              if (p.useDome) r_cbo.dome.get := io.i_dome.get
+              if (p.useField) r_cbo.field.get := io.i_field.get
               r_cbo.op := CBOOP.FLUSH
               r_cbo.sort := CBOSORT.E
               r_cbo.block := CBOBLOCK.FULL
@@ -114,7 +114,7 @@ class Bru (p: IntUnitParams) extends Module {
               r_cbo.valid := true.B
               r_cbo.ready := false.B
               r_cbo.hart := 0.U
-              if (p.useDome) r_cbo.dome.get := io.i_dome.get
+              if (p.useField) r_cbo.field.get := io.i_field.get
               r_cbo.sort := CBOSORT.A
               r_cbo.block := CBOBLOCK.LINE
               r_cbo.addr := io.b_in.data.get.s1
@@ -134,7 +134,7 @@ class Bru (p: IntUnitParams) extends Module {
               r_cbo.valid := true.B
               r_cbo.ready := false.B
               r_cbo.hart := 0.U
-              if (p.useDome) r_cbo.dome.get := io.i_dome.get
+              if (p.useField) r_cbo.field.get := io.i_field.get
               r_cbo.op := CBOOP.PFTCH
               r_cbo.addr := io.b_in.data.get.s1
 
@@ -274,7 +274,7 @@ class Bru (p: IntUnitParams) extends Module {
   if (p.useCbo) {
     io.b_cbo.get.valid := r_cbo.valid
     io.b_cbo.get.hart := r_cbo.hart
-    if (p.useDome) io.b_cbo.get.dome.get := r_cbo.dome.get 
+    if (p.useField) io.b_cbo.get.field.get := r_cbo.field.get 
     io.b_cbo.get.op := r_cbo.op
     io.b_cbo.get.sort := r_cbo.sort
     io.b_cbo.get.block := r_cbo.block  

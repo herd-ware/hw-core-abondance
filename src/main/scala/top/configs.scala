@@ -69,7 +69,7 @@ object PipelineConfigBase extends PipelineConfig (
   //            CHAMP
   // ------------------------------
   useChamp = false,
-  nDome = 1,
+  nField = 1,
   nPart = 1,
   nChampTrapLvl = 1,
 
@@ -140,7 +140,7 @@ object AbondanceConfigBase extends AbondanceConfig (
   useChampExtCst = false,
   nChampTrapLvl = 2,
   
-  nDomeFlushCycle = 20,
+  nFieldFlushCycle = 20,
   nPart = 2,
 
   // ------------------------------

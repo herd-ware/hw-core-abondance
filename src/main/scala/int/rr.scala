@@ -1,10 +1,10 @@
 /*
- * File: rr.scala
+ * File: rr.scala                                                              *
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-02-28 10:42:12 pm
- * Modified By: Mathieu Escouteloup
+ * Last Modified: 2023-03-02 12:15:34 pm                                       *
+ * Modified By: Mathieu Escouteloup                                            *
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
  * Copyright (c) 2023 HerdWare                                                 *
@@ -19,7 +19,7 @@ import chisel3._
 import chisel3.util._
 
 import herd.common.gen._
-import herd.common.dome._
+import herd.common.field._
 import herd.common.isa.riscv._
 import herd.core.aubrac.back.{OP, SlctSize}
 import herd.core.abondance.common._
@@ -30,7 +30,7 @@ class RrStage(p: IntUnitParams) extends Module {
   import herd.core.abondance.int.INTUNIT._
   
   val io = IO(new Bundle {
-    val b_unit = if (p.useDome) Some(new RsrcIO(p.nHart, p.nDome, 1)) else None
+    val b_unit = if (p.useField) Some(new RsrcIO(p.nHart, p.nField, 1)) else None
 
     val i_flush = Input(Bool())
 
@@ -57,7 +57,7 @@ class RrStage(p: IntUnitParams) extends Module {
   // ******************************
   val w_unit_flush = Wire(Bool())
 
-  if (p.useDome) {
+  if (p.useField) {
     w_unit_flush := io.b_unit.get.flush | io.i_flush | (io.i_br_new.valid & io.b_in.ctrl.get.br.mask(io.i_br_new.tag))
   } else {
     w_unit_flush := io.i_flush | (io.i_br_new.valid & io.b_in.ctrl.get.br.mask(io.i_br_new.tag))
@@ -204,9 +204,9 @@ class RrStage(p: IntUnitParams) extends Module {
   m_out.io.b_out.ready := io.b_out.ready
 
   // ******************************
-  //             DOME
+  //             FIELD
   // ******************************
-  if (p.useDome) {
+  if (p.useField) {
     io.b_unit.get.free := ~m_out.io.o_val.valid    
   }  
 

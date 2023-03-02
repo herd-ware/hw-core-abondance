@@ -1,10 +1,10 @@
 /*
- * File: back.scala
+ * File: back.scala                                                            *
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-03-01 12:21:23 pm
- * Modified By: Mathieu Escouteloup
+ * Last Modified: 2023-03-02 12:13:02 pm                                       *
+ * Modified By: Mathieu Escouteloup                                            *
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
  * Copyright (c) 2023 HerdWare                                                 *
@@ -19,7 +19,7 @@ import chisel3._
 import chisel3.util._
 
 import herd.common.gen._
-import herd.common.dome._
+import herd.common.field._
 import herd.common.isa.riscv._
 import herd.common.isa.count.{CsrBus => CountBus}
 import herd.core.aubrac.common._
@@ -33,8 +33,8 @@ import herd.io.core.clint.{ClintIO}
 
 class Back (p: BackParams) extends Module {
   val io = IO(new Bundle {
-    val b_hart = if (p.useDome) Some(new RsrcIO(1, 1, 1)) else None
-    val b_back = if (p.useDome) Some(Vec(p.nBackPort, new RsrcIO(1, 1, 1))) else None
+    val b_hart = if (p.useField) Some(new RsrcIO(1, 1, 1)) else None
+    val b_back = if (p.useField) Some(Vec(p.nBackPort, new RsrcIO(1, 1, 1))) else None
 
     val b_in = Vec(p.nBackPort, Flipped(new GenRVIO(p,new FrontBus(p.debug, p.nAddrBit, p.nInstrBit), UInt(0.W))))
 
@@ -77,7 +77,7 @@ class Back (p: BackParams) extends Module {
   // ******************************
   //              ID
   // ******************************
-  if (p.useDome) {
+  if (p.useField) {
     m_id.io.b_hart.get <> io.b_hart.get
     m_id.io.b_back.get <> io.b_back.get
   }
@@ -93,7 +93,7 @@ class Back (p: BackParams) extends Module {
   // ******************************
   //              REN
   // ******************************
-  if (p.useDome) {
+  if (p.useField) {
     m_ren.io.b_back.get <> io.b_back.get
   }
   m_ren.io.i_flush := io.i_flush | m_rob.io.o_init
@@ -108,7 +108,7 @@ class Back (p: BackParams) extends Module {
   // ******************************
   //              GPR
   // ******************************
-  if (p.useDome) {
+  if (p.useField) {
     m_gpr.io.b_hart.get <> io.b_hart.get
   }
   m_gpr.io.i_br_act := m_id.io.o_br_act  
@@ -122,7 +122,7 @@ class Back (p: BackParams) extends Module {
   // ******************************
   //              ROB
   // ******************************
-  if (p.useDome) {
+  if (p.useField) {
     m_rob.io.b_hart.get <> io.b_hart.get
   }
   m_rob.io.b_pc <> io.b_pc
@@ -136,7 +136,7 @@ class Back (p: BackParams) extends Module {
   // ******************************
   //              ISS
   // ******************************
-  if (p.useDome) {
+  if (p.useField) {
     m_iss.io.b_hart.get <> io.b_hart.get
     m_iss.io.b_back.get <> io.b_back.get
   }
@@ -169,9 +169,9 @@ class Back (p: BackParams) extends Module {
   io.o_stat := m_rob.io.o_stat
 
   // ******************************
-  //             DOME
+  //             FIELD
   // ******************************
-  if (p.useDome) {
+  if (p.useField) {
     io.b_hart.get.free := m_id.io.b_hart.get.free & m_gpr.io.b_hart.get.free & m_rob.io.b_hart.get.free & m_iss.io.b_hart.get.free
 
     for (bp <- 0 until p.nBackPort) {

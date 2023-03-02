@@ -1,10 +1,10 @@
 /*
- * File: abondance.scala
+ * File: abondance.scala                                                       *
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-03-01 12:25:21 pm
- * Modified By: Mathieu Escouteloup
+ * Last Modified: 2023-03-02 12:18:40 pm                                       *
+ * Modified By: Mathieu Escouteloup                                            *
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
  * Copyright (c) 2023 HerdWare                                                 *
@@ -18,7 +18,7 @@ package herd.core.abondance
 import chisel3._
 import chisel3.util._
 
-import herd.common.dome._
+import herd.common.field._
 import herd.common.mem.mb4s._
 import herd.common.mem.cbo._
 import herd.core.aubrac.common._
@@ -30,8 +30,8 @@ import herd.mem.hay._
 
 class Abondance (p: AbondanceParams) extends Module {
   val io = IO(new Bundle {
-    val b_dome = if (p.useDome) Some(Flipped(Vec(p.nDome, new DomeIO(p.nAddrBit, p.nDataBit)))) else None
-    val b_pall = if (p.useDome) Some(Flipped(new NRsrcIO(p.nHart, p.nDome, p.nPart))) else None
+    val b_field = if (p.useField) Some(Flipped(Vec(p.nField, new FieldIO(p.nAddrBit, p.nDataBit)))) else None
+    val b_pall = if (p.useField) Some(Flipped(new NRsrcIO(p.nHart, p.nField, p.nPart))) else None
 
     val b_imem = if (!p.useL2) Some(new Mb4sIO(p.pLLIBus)) else None
     val b_d0mem = if (!p.useL2 && !p.useL1D) Some(new Mb4sIO(p.pLLDBus)) else None
@@ -53,7 +53,7 @@ class Abondance (p: AbondanceParams) extends Module {
   // ******************************
   val m_pipe = Module(new Pipeline(p))
   val m_hfu = if (p.useChamp) Some(Module(new Hfu(p.pHfu))) else None
-  val m_pall = if (p.useDome) Some(Module(new StaticSlct(p.nDome, p.nPart, 1))) else None
+  val m_pall = if (p.useField) Some(Module(new StaticSlct(p.nField, p.nPart, 1))) else None
   val m_io = Module(new IOCore(p.pIO))
   val m_l0dcross = Module(new Mb4sCrossbar(p.pL0DCross))
   val m_l1i = if (p.useL1I) Some(Module(new Hay(p.pL1I))) else None
@@ -64,32 +64,32 @@ class Abondance (p: AbondanceParams) extends Module {
   // ******************************
   //           PIPELINE
   // ******************************
-  if (p.useDome) {
-    m_pipe.io.b_dome.get <> m_hfu.get.io.b_dome 
+  if (p.useField) {
+    m_pipe.io.b_field.get <> m_hfu.get.io.b_field 
     m_pipe.io.b_hart.get <> m_hfu.get.io.b_hart
   }
 
   m_pipe.io.b_clint <> m_io.io.b_clint
 
   // ******************************
-  //           DOME SELECT
+  //          FIELD SELECT
   // ******************************
-  if (p.useDome) { 
-    for (d <- 0 until p.nDome) {
-      m_pall.get.io.i_weight(d) := m_hfu.get.io.b_pall.weight(d)
+  if (p.useField) { 
+    for (f <- 0 until p.nField) {
+      m_pall.get.io.i_weight(f) := m_hfu.get.io.b_pall.weight(f)
     }
 
-    if (p.useL1I && p.pL1I.multiDome) {
+    if (p.useL1I && p.pL1I.multiField) {
       m_l1i.get.io.i_slct_prev.get := m_pall.get.io.o_slct
       if (p.useL2) m_l2.get.io.i_slct_prev.get := m_l1i.get.io.o_slct_next.get
     }
 
-    if (p.useL1D && p.pL1D.multiDome) {
+    if (p.useL1D && p.pL1D.multiField) {
       m_l1d.get.io.i_slct_prev.get := m_pall.get.io.o_slct
       if (p.useL2) m_l2.get.io.i_slct_prev.get := m_l1d.get.io.o_slct_next.get
     }
 
-    if (p.useL2 && p.pL2.multiDome && (!p.useL1I || !p.pL1I.multiDome) && (!p.useL1D || !p.pL1D.multiDome)) {
+    if (p.useL2 && p.pL2.multiField && (!p.useL1I || !p.pL1I.multiField) && (!p.useL1D || !p.pL1D.multiField)) {
       m_l2.get.io.i_slct_prev.get := m_pall.get.io.o_slct
     }
   }
@@ -108,8 +108,8 @@ class Abondance (p: AbondanceParams) extends Module {
   if (p.useL1I) {
     m_pipe.io.b_csr_mem.l1imiss := m_l1i.get.io.o_miss(0)
 
-    if (p.useDome) {
-      m_l1i.get.io.b_dome.get <> m_hfu.get.io.b_dome
+    if (p.useField) {
+      m_l1i.get.io.b_field.get <> m_hfu.get.io.b_field
       m_l1i.get.io.b_part.get <> m_hfu.get.io.b_pall
     }
     if (p.useCbo) {
@@ -119,7 +119,7 @@ class Abondance (p: AbondanceParams) extends Module {
       m_l1i.get.io.b_cbo(0).valid := m_pipe.io.b_cbo.get.valid & w_l1i_cbo(0)
     }
 
-    if (p.useDome) m_l1i.get.io.i_slct_prev.get := m_pall.get.io.o_slct
+    if (p.useField) m_l1i.get.io.i_slct_prev.get := m_pall.get.io.o_slct
     m_l1i.get.io.b_prev(0) <> m_pipe.io.b_imem
     if (!p.useL2) m_l1i.get.io.b_next <> io.b_imem.get
   } else {
@@ -131,7 +131,7 @@ class Abondance (p: AbondanceParams) extends Module {
   // ------------------------------
   //              L0D
   // ------------------------------
-  if (p.useDome) m_l0dcross.io.b_dome.get <> m_hfu.get.io.b_dome
+  if (p.useField) m_l0dcross.io.b_field.get <> m_hfu.get.io.b_field
   m_l0dcross.io.b_m(0) <> m_pipe.io.b_d0mem
   m_l0dcross.io.b_m(1) <> m_pipe.io.b_d1mem
   if (p.useChamp) m_l0dcross.io.b_m(2) <> m_hfu.get.io.b_dmem
@@ -152,8 +152,8 @@ class Abondance (p: AbondanceParams) extends Module {
   if (p.useL1D) {
     m_pipe.io.b_csr_mem.l1dmiss := m_l1d.get.io.o_miss(0)
 
-    if (p.useDome) {
-      m_l1d.get.io.b_dome.get <> m_hfu.get.io.b_dome
+    if (p.useField) {
+      m_l1d.get.io.b_field.get <> m_hfu.get.io.b_field
       m_l1d.get.io.b_part.get <> m_hfu.get.io.b_pall
     }
     if (p.useCbo) {
@@ -163,12 +163,12 @@ class Abondance (p: AbondanceParams) extends Module {
       m_l1d.get.io.b_cbo(0).valid := m_pipe.io.b_cbo.get.valid & w_l1d_cbo(0)
     }
 
-    if (p.useDome) m_l1d.get.io.i_slct_prev.get := m_pall.get.io.o_slct
+    if (p.useField) m_l1d.get.io.i_slct_prev.get := m_pall.get.io.o_slct
     m_l1d.get.io.b_prev(0) <> m_l0dcross.io.b_s(2)
     m_l1d.get.io.b_prev(1) <> m_l0dcross.io.b_s(3)
     if (!p.useL2) {
-      if (p.useDome) {
-        m_llcross.get.io.b_dome.get <> m_hfu.get.io.b_dome
+      if (p.useField) {
+        m_llcross.get.io.b_field.get <> m_hfu.get.io.b_field
         m_llcross.get.io.i_slct_req.get := m_l1d.get.io.o_slct_next.get
         m_llcross.get.io.i_slct_read.get := m_l1d.get.io.o_slct_prev.get
         m_llcross.get.io.i_slct_write.get := m_l1d.get.io.o_slct_prev.get
@@ -192,15 +192,15 @@ class Abondance (p: AbondanceParams) extends Module {
   if (p.useL2) {
     m_pipe.io.b_csr_mem.l2miss := m_l2.get.io.o_miss(0)
 
-    if (p.useDome) {
-      m_l2.get.io.b_dome.get <> m_hfu.get.io.b_dome
-      for (d <- 0 until p.nDome) {
+    if (p.useField) {
+      m_l2.get.io.b_field.get <> m_hfu.get.io.b_field
+      for (f <- 0 until p.nField) {
         if (p.useL1I && p.useL1D) {
-          m_l2.get.io.b_dome.get(d).flush := m_hfu.get.io.b_dome(d).flush & m_l1i.get.io.b_dome.get(d).free & m_l1d.get.io.b_dome.get(d).free
+          m_l2.get.io.b_field.get(f).flush := m_hfu.get.io.b_field(f).flush & m_l1i.get.io.b_field.get(f).free & m_l1d.get.io.b_field.get(f).free
         } else if (p.useL1I) {        
-          m_l2.get.io.b_dome.get(d).flush := m_hfu.get.io.b_dome(d).flush & m_l1i.get.io.b_dome.get(d).free
+          m_l2.get.io.b_field.get(f).flush := m_hfu.get.io.b_field(f).flush & m_l1i.get.io.b_field.get(f).free
         } else if (p.useL1D) {        
-          m_l2.get.io.b_dome.get(d).flush := m_hfu.get.io.b_dome(d).flush & m_l1d.get.io.b_dome.get(d).free
+          m_l2.get.io.b_field.get(f).flush := m_hfu.get.io.b_field(f).flush & m_l1d.get.io.b_field.get(f).free
         }
       }
 
@@ -227,7 +227,7 @@ class Abondance (p: AbondanceParams) extends Module {
       m_l2.get.io.b_cbo(0).valid := m_pipe.io.b_cbo.get.valid & w_l2_cbo(0) & ((w_l1i_cbo(1) & w_l1d_cbo(1)) | m_pipe.io.b_cbo.get.hint)
     }
 
-    if (p.useDome) {
+    if (p.useField) {
       if (p.useL1D) {
         m_l2.get.io.i_slct_prev.get := m_l1d.get.io.o_slct_next.get
       } else if (p.useL1I) {
@@ -249,8 +249,8 @@ class Abondance (p: AbondanceParams) extends Module {
       m_l2.get.io.b_prev(2) <> m_l0dcross.io.b_s(3)
     }
 
-    if (p.useDome) {
-      m_llcross.get.io.b_dome.get <> m_hfu.get.io.b_dome
+    if (p.useField) {
+      m_llcross.get.io.b_field.get <> m_hfu.get.io.b_field
       m_llcross.get.io.i_slct_req.get := m_l2.get.io.o_slct_next.get
       m_llcross.get.io.i_slct_read.get := m_l2.get.io.o_slct_prev.get
       m_llcross.get.io.i_slct_write.get := m_l2.get.io.o_slct_prev.get
@@ -273,7 +273,7 @@ class Abondance (p: AbondanceParams) extends Module {
   //             CLINT
   // ******************************
   if (p.useChamp) {
-    m_io.io.b_dome.get <> m_hfu.get.io.b_dome
+    m_io.io.b_field.get <> m_hfu.get.io.b_field
 
     m_io.io.i_irq_lei.get := io.i_irq_lei.get 
     m_io.io.i_irq_lsi.get := io.i_irq_lsi.get 
@@ -292,30 +292,30 @@ class Abondance (p: AbondanceParams) extends Module {
     m_hfu.get.io.b_port <> m_pipe.io.b_hfu.get    
 
     // ------------------------------
-    //           DOME STATE
+    //          FIELD STATE
     // ------------------------------
-    val w_dome_free = Wire(Vec(p.nDome, Vec(6, Bool())))
+    val w_field_free = Wire(Vec(p.nField, Vec(6, Bool())))
 
-    for (d <- 0 until p.nDome) {
+    for (f <- 0 until p.nField) {
       for (l <- 0 until 6) {
-        w_dome_free(d)(l) := true.B
+        w_field_free(f)(l) := true.B
       }
     }
 
-    io.b_dome.get <> m_hfu.get.io.b_dome
-    for (d <- 0 until p.nDome) {
-      io.b_dome.get(d).flush := m_hfu.get.io.b_dome(d).flush & w_dome_free(d).asUInt.andR
+    io.b_field.get <> m_hfu.get.io.b_field
+    for (f <- 0 until p.nField) {
+      io.b_field.get(f).flush := m_hfu.get.io.b_field(f).flush & w_field_free(f).asUInt.andR
     }
 
-    for (d <- 0 until p.nDome) {
-      w_dome_free(d)(0) := m_pipe.io.b_dome.get(d).free
-      w_dome_free(d)(1) := m_l0dcross.io.b_dome.get(d).free
-      w_dome_free(d)(2) := m_io.io.b_dome.get(d).free
-      if (p.useL1I) w_dome_free(d)(3) := m_l1i.get.io.b_dome.get(d).free
-      if (p.useL1D) w_dome_free(d)(4) := m_l1d.get.io.b_dome.get(d).free
-      if (p.useL2) w_dome_free(d)(5) := m_l2.get.io.b_dome.get(d).free
+    for (f <- 0 until p.nField) {
+      w_field_free(f)(0) := m_pipe.io.b_field.get(f).free
+      w_field_free(f)(1) := m_l0dcross.io.b_field.get(f).free
+      w_field_free(f)(2) := m_io.io.b_field.get(f).free
+      if (p.useL1I) w_field_free(f)(3) := m_l1i.get.io.b_field.get(f).free
+      if (p.useL1D) w_field_free(f)(4) := m_l1d.get.io.b_field.get(f).free
+      if (p.useL2) w_field_free(f)(5) := m_l2.get.io.b_field.get(f).free
       
-      m_hfu.get.io.b_dome(d).free := w_dome_free(d).asUInt.andR & io.b_dome.get(d).free
+      m_hfu.get.io.b_field(f).free := w_field_free(f).asUInt.andR & io.b_field.get(f).free
     }
 
     // ------------------------------
@@ -323,7 +323,7 @@ class Abondance (p: AbondanceParams) extends Module {
     // ------------------------------
 
     // ------------------------------
-    //    EXECUTED DOME PART STATE
+    //    EXECUTEDFIELD PART STATE
     // ------------------------------
     for (pa <- 0 until p.nPart) {
       m_hfu.get.io.b_pexe.state(pa).free := true.B

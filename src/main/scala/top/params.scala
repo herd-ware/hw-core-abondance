@@ -57,9 +57,9 @@ trait PipelineParams extends NlpParams
   //            CHAMP
   // ------------------------------
   def useChamp: Boolean
-  override def useDome: Boolean = useChamp
-  def nDome: Int
-  override def multiDome: Boolean = false
+  override def useField: Boolean = useChamp
+  def nField: Int
+  override def multiField: Boolean = false
   def nPart: Int
   def nChampTrapLvl: Int
 
@@ -153,7 +153,7 @@ case class PipelineConfig (
   //            CHAMP
   // ------------------------------
   useChamp: Boolean,
-  nDome: Int,
+  nField: Int,
   nPart: Int,
   nChampTrapLvl: Int,
 
@@ -225,7 +225,7 @@ trait AbondanceParams extends PipelineParams {
   def useChampExtCst: Boolean
   def nChampTrapLvl: Int
   
-  def nDomeFlushCycle: Int
+  def nFieldFlushCycle: Int
   def nPart: Int
 
   def pHfu: HfuParams = new HfuConfig (
@@ -242,11 +242,11 @@ trait AbondanceParams extends PipelineParams {
     useChampExtCst = useChampExtCst,
     nChampTrapLvl = nChampTrapLvl,
 
-    nDomeFlushCycle = nDomeFlushCycle,
+    nFieldFlushCycle = nFieldFlushCycle,
     nPart = nPart
   )
 
-  def nDome: Int = pHfu.nDome
+  def nField: Int = pHfu.nField
 
   // ------------------------------
   //           FRONT END
@@ -426,7 +426,7 @@ trait AbondanceParams extends PipelineParams {
     nBus = 0,
     
     debug = debug,  
-    multiDome = false,
+    multiField = false,
     nDepth = 3,
     useDirect = false
   )
@@ -586,7 +586,7 @@ trait AbondanceParams extends PipelineParams {
     nBus = 1,
     
     debug = debug,  
-    multiDome = true,
+    multiField = true,
     nDepth = 4,
     useDirect = false
   )
@@ -611,7 +611,7 @@ case class AbondanceConfig (
   useChampExtCst: Boolean,
   nChampTrapLvl: Int,
 
-  nDomeFlushCycle: Int,
+  nFieldFlushCycle: Int,
   nPart: Int,
 
   // ------------------------------

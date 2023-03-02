@@ -3,7 +3,7 @@
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-02-26 09:30:58 am                                       *
+ * Last Modified: 2023-03-02 12:15:28 pm                                       *
  * Modified By: Mathieu Escouteloup                                            *
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
@@ -19,7 +19,7 @@ import chisel3._
 import chisel3.util._
 
 import herd.common.gen._
-import herd.common.dome._
+import herd.common.field._
 import herd.core.abondance.common._
 import herd.core.abondance.back.{BranchBus, BypassBus, CommitBus, GprWriteIO}
  
@@ -28,7 +28,7 @@ class IntQueue(p: IntParams) extends Module {
   import herd.core.abondance.int.INTUNIT._
 
   val io = IO(new Bundle {
-    val b_hart = if (p.useDome) Some(new RsrcIO(p.nHart, p.nDome, 1)) else None
+    val b_hart = if (p.useField) Some(new RsrcIO(p.nHart, p.nField, 1)) else None
 
     val i_flush = Input(Bool())
 
@@ -63,7 +63,7 @@ class IntQueue(p: IntParams) extends Module {
   // ******************************
   val w_hart_flush = Wire(Bool())
 
-  if (p.useDome) {
+  if (p.useField) {
     w_hart_flush := io.b_hart.get.flush
   } else {
     w_hart_flush := false.B
@@ -290,9 +290,9 @@ class IntQueue(p: IntParams) extends Module {
   }
 
   // ******************************
-  //             DOME
+  //             FIELD
   // ******************************
-  if (p.useDome) {
+  if (p.useField) {
     io.b_hart.get.free := true.B
     when (io.b_hart.get.flush) {
       for (iq <- 0 until p.nIntQueue) {

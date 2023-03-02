@@ -3,7 +3,7 @@
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-02-26 09:29:56 am                                       *
+ * Last Modified: 2023-03-02 12:13:50 pm                                       *
  * Modified By: Mathieu Escouteloup                                            *
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
@@ -19,7 +19,7 @@ import chisel3._
 import chisel3.util._
 
 import herd.common.gen._
-import herd.common.dome._
+import herd.common.field._
 import herd.core.abondance.common._
 import herd.core.abondance.back.{CommitBus}
 import herd.core.abondance.back.{BackConfigBase}
@@ -27,7 +27,7 @@ import herd.core.abondance.back.{BackConfigBase}
 
 class ExtAckQueue(p: ExUnitParams, nQueue: Int, nBus: Int) extends Module {  
   val io = IO(new Bundle {
-    val b_unit = if (p.useDome) Some(new RsrcIO(p.nHart, p.nDome, 1)) else None
+    val b_unit = if (p.useField) Some(new RsrcIO(p.nHart, p.nField, 1)) else None
     
     val i_flush = Input(Bool())
 
@@ -56,7 +56,7 @@ class ExtAckQueue(p: ExUnitParams, nQueue: Int, nBus: Int) extends Module {
   // ******************************
   val w_unit_flush = Wire(Bool())
 
-  if (p.useDome) {
+  if (p.useField) {
     w_unit_flush := io.b_unit.get.flush
   } else {
     w_unit_flush := false.B
@@ -177,9 +177,9 @@ class ExtAckQueue(p: ExUnitParams, nQueue: Int, nBus: Int) extends Module {
   }
 
   // ******************************
-  //             DOME
+  //             FIELD
   // ******************************
-  if (p.useDome) {
+  if (p.useField) {
     io.b_unit.get.free := true.B
     for (aq <- 0 until nQueue) {
       when (r_queue(aq).valid) {

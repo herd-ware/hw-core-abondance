@@ -3,7 +3,7 @@
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-02-26 09:31:31 am                                       *
+ * Last Modified: 2023-03-02 12:17:49 pm                                       *
  * Modified By: Mathieu Escouteloup                                            *
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
@@ -19,7 +19,7 @@ import chisel3._
 import chisel3.util._
 
 import herd.common.gen._
-import herd.common.dome._
+import herd.common.field._
 import herd.common.mem.mb4s._
 import herd.common.mem.mb4s.{OP => LSUUOP}
 import herd.core.abondance.common._
@@ -28,7 +28,7 @@ import herd.core.abondance.back.{BranchBus, BypassBus, CommitBus, GprReadIO, Gpr
 
 class Lsu(p: LsuParams) extends Module {  
   val io = IO(new Bundle {
-    val b_hart = if (p.useDome) Some(new RsrcIO(p.nHart, p.nDome, 1)) else None
+    val b_hart = if (p.useField) Some(new RsrcIO(p.nHart, p.nField, 1)) else None
 
     val i_flush = Input(Bool())
 
@@ -72,7 +72,7 @@ class Lsu(p: LsuParams) extends Module {
   // ******************************
   val w_hart_flush = Wire(Bool())
 
-  if (p.useDome) {
+  if (p.useField) {
     w_hart_flush := io.b_hart.get.flush
   } else {
     w_hart_flush := false.B
@@ -174,7 +174,7 @@ class Lsu(p: LsuParams) extends Module {
   // ------------------------------
   w_wait_st_queue := false.B
 
-  if (p.useDome) m_st.io.b_hart.get <> io.b_hart.get
+  if (p.useField) m_st.io.b_hart.get <> io.b_hart.get
   m_st.io.i_flush := io.i_flush
 
   m_st.io.i_br_up := io.i_br_up
@@ -206,7 +206,7 @@ class Lsu(p: LsuParams) extends Module {
   // ******************************
   w_wait_ld := false.B
 
-  if (p.useDome) m_ld.io.b_hart.get <> io.b_hart.get
+  if (p.useField) m_ld.io.b_hart.get <> io.b_hart.get
   m_ld.io.i_flush := io.i_flush
 
   m_ld.io.i_br_up := io.i_br_up
@@ -247,7 +247,7 @@ class Lsu(p: LsuParams) extends Module {
   // ******************************
   //            EX STAGE
   // ******************************
-  if (p.useDome) m_ex.io.b_hart.get <> io.b_hart.get
+  if (p.useField) m_ex.io.b_hart.get <> io.b_hart.get
   m_ex.io.i_flush := io.i_flush
   m_ex.io.i_br_up := io.i_br_up
   m_ex.io.i_br_new := io.i_br_new
@@ -267,7 +267,7 @@ class Lsu(p: LsuParams) extends Module {
   w_wait_d0_req := (~m_ld.io.b_mem(0).ctrl.get.fwd.asUInt.orR | ~r_fwd_av(0)) & ~(m_mem(0).io.b_in.ready & io.b_d0mem.req.ready(0))
 
   io.b_d0mem.req.valid := m_ld.io.b_mem(0).valid & (~m_ld.io.b_mem(0).ctrl.get.fwd.asUInt.orR | ~r_fwd_av(0)) & m_mem(0).io.b_in.ready
-  if (p.useDome) io.b_d0mem.req.dome.get := io.b_hart.get.dome
+  if (p.useField) io.b_d0mem.req.field.get := io.b_hart.get.field
   io.b_d0mem.req.ctrl.hart := 0.U
   if (p.useExtA) {
     io.b_d0mem.req.ctrl.op := m_ld.io.b_mem(0).ctrl.get.ctrl.uop
@@ -281,7 +281,7 @@ class Lsu(p: LsuParams) extends Module {
   // ------------------------------
   //             QUEUE
   // ------------------------------
-  if (p.useDome) m_mem(0).io.b_hart.get <> io.b_hart.get
+  if (p.useField) m_mem(0).io.b_hart.get <> io.b_hart.get
   m_mem(0).io.i_flush := false.B
   m_mem(0).io.i_br_up := io.i_br_up
   m_mem(0).io.i_br_new := io.i_br_new
@@ -340,7 +340,7 @@ class Lsu(p: LsuParams) extends Module {
   io.b_d0mem.read.ready(0) := m_end(0).io.b_in.ready & m_mem(0).io.b_out.valid
 
   io.b_d0mem.write.valid := false.B
-  if (p.useDome) io.b_d0mem.write.dome.get := io.b_hart.get.dome
+  if (p.useField) io.b_d0mem.write.field.get := io.b_hart.get.field
   io.b_d0mem.write.data := DontCare
 
   // ------------------------------
@@ -381,7 +381,7 @@ class Lsu(p: LsuParams) extends Module {
   w_wait_d1_req := (m_st.io.b_mem.valid & ~io.b_d1mem.req.ready(0)) | (~m_st.io.b_mem.valid & (~m_ld.io.b_mem(1).ctrl.get.fwd.asUInt.orR | ~r_fwd_av(1)) & ~(m_mem(1).io.b_in.ready & io.b_d1mem.req.ready(0)))
 
   io.b_d1mem.req.valid := m_mem(1).io.b_in.ready & (m_st.io.b_mem.valid | (m_ld.io.b_mem(1).valid & (~m_ld.io.b_mem(1).ctrl.get.fwd.asUInt.orR | ~r_fwd_av(1))))
-  if (p.useDome) io.b_d1mem.req.dome.get := io.b_hart.get.dome
+  if (p.useField) io.b_d1mem.req.field.get := io.b_hart.get.field
   io.b_d1mem.req.ctrl.hart := 0.U
   if (p.useExtA) io.b_d1mem.req.ctrl.amo.get := m_st.io.b_mem.ctrl.get.ctrl.amo
   when (m_st.io.b_mem.valid) {
@@ -405,7 +405,7 @@ class Lsu(p: LsuParams) extends Module {
   // ------------------------------
   //             QUEUE
   // ------------------------------
-  if (p.useDome) m_mem(1).io.b_hart.get <> io.b_hart.get
+  if (p.useField) m_mem(1).io.b_hart.get <> io.b_hart.get
   m_mem(1).io.i_flush := false.B
   m_mem(1).io.i_br_up := io.i_br_up
   m_mem(1).io.i_br_new := io.i_br_new
@@ -483,7 +483,7 @@ class Lsu(p: LsuParams) extends Module {
     m_rd1mem.get.io.b_sout.ready := m_end(1).io.b_in.ready & m_mem(1).io.b_out.valid & m_mem(1).io.b_out.ctrl.ctrl.ld
 
     io.b_d1mem.write.valid := m_mem(1).io.b_out.valid & m_mem(1).io.b_out.ctrl.ctrl.st & r_wd1mem
-    if (p.useDome) io.b_d1mem.write.dome.get := io.b_hart.get.dome
+    if (p.useField) io.b_d1mem.write.field.get := io.b_hart.get.field
     io.b_d1mem.write.data := m_mem(1).io.b_out.data
 
     when (m_mem(1).io.b_out.valid & m_mem(1).io.b_out.ctrl.ctrl.a) {      
@@ -500,7 +500,7 @@ class Lsu(p: LsuParams) extends Module {
     io.b_d1mem.read.ready(0) := m_end(1).io.b_in.ready & m_mem(1).io.b_out.valid & m_mem(1).io.b_out.ctrl.ctrl.ld
 
     io.b_d1mem.write.valid := m_mem(1).io.b_out.valid & m_mem(1).io.b_out.ctrl.ctrl.st
-    if (p.useDome) io.b_d1mem.write.dome.get := io.b_hart.get.dome
+    if (p.useField) io.b_d1mem.write.field.get := io.b_hart.get.field
     io.b_d1mem.write.data := m_mem(1).io.b_out.data
   }
 
@@ -607,9 +607,9 @@ class Lsu(p: LsuParams) extends Module {
   }
 
   // ******************************
-  //             DOME
+  //             FIELD
   // ******************************
-  if (p.useDome) {
+  if (p.useField) {
     val w_hart_free = Wire(Vec(9, Bool()))
 
     w_hart_free(0) := m_st.io.b_hart.get.free

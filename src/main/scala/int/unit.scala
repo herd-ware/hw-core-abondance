@@ -1,10 +1,10 @@
 /*
- * File: unit.scala
+ * File: unit.scala                                                            *
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-02-28 10:42:09 pm
- * Modified By: Mathieu Escouteloup
+ * Last Modified: 2023-03-02 12:15:42 pm                                       *
+ * Modified By: Mathieu Escouteloup                                            *
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
  * Copyright (c) 2023 HerdWare                                                 *
@@ -19,7 +19,7 @@ import chisel3._
 import chisel3.util._
 
 import herd.common.gen._
-import herd.common.dome._
+import herd.common.field._
 import herd.common.isa.riscv._
 import herd.common.mem.cbo._
 import herd.core.aubrac.back.csr.{CsrIO}
@@ -32,7 +32,7 @@ class IntUnit (p: IntUnitParams) extends Module {
   import herd.core.abondance.int.INTUNIT._
 
   val io = IO(new Bundle {
-    val b_unit = if (p.useDome) Some(new RsrcIO(p.nHart, p.nDome, 1)) else None
+    val b_unit = if (p.useField) Some(new RsrcIO(p.nHart, p.nField, 1)) else None
 
     val i_flush = Input(Bool())
 
@@ -47,7 +47,7 @@ class IntUnit (p: IntUnitParams) extends Module {
     val b_write = Flipped(new GprWriteIO(p.nDataBit, p.nGprPhy))
 
     val o_flush = if (p.useBru) Some(Output(Bool())) else None
-    val b_cbo = if (p.useCbo) Some(new CboIO(1, p.useDome, p.nDome, p.nAddrBit)) else None
+    val b_cbo = if (p.useCbo) Some(new CboIO(1, p.useField, p.nField, p.nAddrBit)) else None
 
     val o_byp = Output(Vec(p.nBypass, new BypassBus(p.nDataBit, p.nGprPhy)))
     val o_br_up = if (p.useBru) Some(Output(UInt(p.nSpecBranch.W))) else None
@@ -126,7 +126,7 @@ class IntUnit (p: IntUnitParams) extends Module {
     m_rr.io.b_out.av.bru := true.B
 
     m_bru.get.io.i_flush := io.i_flush
-    if (p.useDome) m_bru.get.io.i_dome.get := io.b_unit.get.dome
+    if (p.useField) m_bru.get.io.i_field.get := io.b_unit.get.field
     m_bru.get.io.b_in.valid := false.B
     m_bru.get.io.b_in.ctrl.get := m_rr.io.b_out.ctrl.get
     m_bru.get.io.b_in.data.get := m_rr.io.b_out.data.get
@@ -421,9 +421,9 @@ class IntUnit (p: IntUnitParams) extends Module {
   }
 
   // ******************************
-  //             DOME
+  //             FIELD
   // ******************************
-  if (p.useDome) {
+  if (p.useField) {
     val w_unit_free = Wire(Vec(4, Bool()))
 
     m_rr.io.b_unit.get <> io.b_unit.get

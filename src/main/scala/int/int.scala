@@ -1,10 +1,10 @@
 /*
- * File: int.scala
+ * File: int.scala                                                             *
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-02-28 10:42:03 pm
- * Modified By: Mathieu Escouteloup
+ * Last Modified: 2023-03-02 12:15:12 pm                                       *
+ * Modified By: Mathieu Escouteloup                                            *
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
  * Copyright (c) 2023 HerdWare                                                 *
@@ -19,7 +19,7 @@ import chisel3._
 import chisel3.util._
 
 import herd.common.gen._
-import herd.common.dome._
+import herd.common.field._
 import herd.common.isa.riscv._
 import herd.common.mem.cbo._
 import herd.core.aubrac.back.csr.{CsrIO}
@@ -33,8 +33,8 @@ class IntPipeline (p: IntParams) extends Module {
   require (p.nCsr == 1, "The whole core must have only one CSR unit.")
 
   val io = IO(new Bundle {
-    val b_hart = if (p.useDome) Some(new RsrcIO(p.nHart, p.nDome, 1)) else None
-    val b_unit = if (p.useDome) Some(new RsrcIO(p.nHart, p.nDome, p.nIntUnit)) else None
+    val b_hart = if (p.useField) Some(new RsrcIO(p.nHart, p.nField, 1)) else None
+    val b_unit = if (p.useField) Some(new RsrcIO(p.nHart, p.nField, p.nIntUnit)) else None
 
     val i_flush = Input(Bool())
 
@@ -48,7 +48,7 @@ class IntPipeline (p: IntParams) extends Module {
     val b_csr = Flipped(new CsrIO(p.nDataBit))
 
     val o_flush = Output(Bool())
-    val b_cbo = if (p.useCbo) Some(new CboIO(1, p.useDome, p.nDome, p.nAddrBit)) else None
+    val b_cbo = if (p.useCbo) Some(new CboIO(1, p.useField, p.nField, p.nAddrBit)) else None
 
     val o_br_up = Output(UInt(p.nSpecBranch.W))
     val o_br_new = Output(new BranchBus(p.nAddrBit, p.nSpecBranch, p.nRobEntry))
@@ -72,7 +72,7 @@ class IntPipeline (p: IntParams) extends Module {
   // ******************************
   //             QUEUE
   // ******************************
-  if (p.useDome) m_queue.io.b_hart.get <> io.b_hart.get
+  if (p.useField) m_queue.io.b_hart.get <> io.b_hart.get
   m_queue.io.i_flush := io.i_flush
 
   m_queue.io.b_in <> io.b_in
@@ -86,7 +86,7 @@ class IntPipeline (p: IntParams) extends Module {
   //             UNIT
   // ******************************
   for (iu <- 0 until p.nIntUnit) {
-    if (p.useDome) m_unit(iu).io.b_unit.get <> io.b_unit.get
+    if (p.useField) m_unit(iu).io.b_unit.get <> io.b_unit.get
     m_unit(iu).io.i_flush := io.i_flush
     m_unit(iu).io.b_in <> m_queue.io.b_out(iu)
 
@@ -124,9 +124,9 @@ class IntPipeline (p: IntParams) extends Module {
   }
 
   // ******************************
-  //             DOME
+  //             FIELD
   // ******************************
-  if (p.useDome) {
+  if (p.useField) {
     val w_unit_free = Wire(Vec(p.nIntUnit, Bool()))
 
     for (iu <- 0 until p.nIntUnit) {

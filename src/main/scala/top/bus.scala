@@ -27,12 +27,12 @@ import herd.core.aubrac.back.csr._
 class PipelineDbgBus (p: PipelineParams) extends Bundle {
   val last = UInt(p.nAddrBit.W)
   val x = Vec(32, UInt(p.nDataBit.W))
-  val csr = new CsrBus(p.nDataBit, p.useDome)
+  val csr = new CsrBus(p.nDataBit, p.useField)
 }
 
 class AbondanceDbgBus (p: AbondanceParams) extends Bundle {
   val last = UInt(p.nAddrBit.W)
   val x = Vec(32, UInt(p.nDataBit.W))
-  val csr = new CsrBus(p.nDataBit, p.useDome)
+  val csr = new CsrBus(p.nDataBit, p.useField)
   val hf = if (p.useChamp) Some(Vec(p.nChampReg, Vec(6, UInt(p.nDataBit.W)))) else None
 }
