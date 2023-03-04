@@ -1,10 +1,10 @@
 /*
- * File: consts.scala                                                          *
+ * File: consts.scala
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-02-26 09:30:44 am                                       *
- * Modified By: Mathieu Escouteloup                                            *
+ * Last Modified: 2023-03-03 04:26:53 pm
+ * Modified By: Mathieu Escouteloup
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
  * Copyright (c) 2023 HerdWare                                                 *
@@ -125,6 +125,10 @@ object INTUOP {
   def CSRW    = 1.U(NBIT.W)
   def CSRS    = 2.U(NBIT.W)
   def CSRC    = 3.U(NBIT.W)
+  def CSRRX   = 4.U(NBIT.W)
+  def CSRRW   = 5.U(NBIT.W)
+  def CSRRS   = 6.U(NBIT.W)
+  def CSRRC   = 7.U(NBIT.W)
 }
 
 // ******************************

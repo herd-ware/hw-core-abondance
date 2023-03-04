@@ -1,10 +1,10 @@
 /*
- * File: back.scala                                                            *
+ * File: back.scala
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-03-02 06:37:55 pm                                       *
- * Modified By: Mathieu Escouteloup                                            *
+ * Last Modified: 2023-03-03 08:01:39 am
+ * Modified By: Mathieu Escouteloup
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
  * Copyright (c) 2023 HerdWare                                                 *
@@ -21,7 +21,7 @@ import chisel3.util._
 import herd.common.gen._
 import herd.common.field._
 import herd.common.isa.riscv._
-import herd.common.isa.hpc.{HpcPipelineBus}
+import herd.common.core.{HpcPipelineBus}
 import herd.core.aubrac.common._
 import herd.core.aubrac.front.{FrontBus}
 import herd.core.abondance.common._

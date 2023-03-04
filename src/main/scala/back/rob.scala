@@ -1,10 +1,10 @@
 /*
- * File: rob.scala                                                             *
+ * File: rob.scala
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-03-02 07:03:54 pm                                       *
- * Modified By: Mathieu Escouteloup                                            *
+ * Last Modified: 2023-03-03 08:16:07 am
+ * Modified By: Mathieu Escouteloup
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
  * Copyright (c) 2023 HerdWare                                                 *
@@ -19,7 +19,7 @@ import chisel3._
 import chisel3.util._
 
 import herd.common.isa.riscv._
-import herd.common.isa.hpc.{HpcInstrBus, HpcPipelineBus}
+import herd.common.core.{HpcInstrBus, HpcPipelineBus}
 import herd.common.field._
 import herd.core.aubrac.common.{TrapBus,EtdBus}
 import herd.core.aubrac.common.{TRAPSRC}
@@ -222,6 +222,7 @@ class Rob(p: BackParams) extends Module {
   val w_hpc_st = Wire(Vec(p.nCommit, Bool()))
   val w_hpc_br = Wire(Vec(p.nCommit, Bool()))
   val w_hpc_mispred = Wire(Vec(p.nCommit, Bool()))
+  val w_hpc_rdcycle = Wire(Vec(p.nCommit, Bool()))
 
   for (c <- 0 until p.nCommit) {
     w_hpc_instret(c) := w_cready(c) & r_entry(w_cpt(c)).valid & ~r_entry(w_cpt(c)).exc
@@ -230,6 +231,7 @@ class Rob(p: BackParams) extends Module {
     w_hpc_st(c) := w_cready(c) & r_entry(w_cpt(c)).valid & r_entry(w_cpt(c)).hpc.st
     w_hpc_br(c) := w_cready(c) & r_entry(w_cpt(c)).valid & r_entry(w_cpt(c)).hpc.br
     w_hpc_mispred(c) := w_cready(c) & r_entry(w_cpt(c)).valid & r_entry(w_cpt(c)).hpc.mispred
+    w_hpc_rdcycle(c) := w_cready(c) & r_entry(w_cpt(c)).valid & r_entry(w_cpt(c)).hpc.rdcycle
   }
 
   io.o_hpc := 0.U.asTypeOf(io.o_hpc)
@@ -239,6 +241,7 @@ class Rob(p: BackParams) extends Module {
   io.o_hpc.st := PopCount(w_hpc_st.asUInt)
   io.o_hpc.br := PopCount(w_hpc_br.asUInt)
   io.o_hpc.mispred := PopCount(w_hpc_mispred.asUInt)
+  io.o_hpc.rdcycle := PopCount(w_hpc_rdcycle.asUInt)
 
   // ******************************
   //              PT

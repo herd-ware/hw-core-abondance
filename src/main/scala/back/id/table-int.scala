@@ -3,7 +3,7 @@
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-03-01 12:20:11 pm
+ * Last Modified: 2023-03-03 04:29:33 pm
  * Modified By: Mathieu Escouteloup
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
@@ -117,17 +117,17 @@ object TABLEINTCSR extends TABLEINT {
   //                           |     |   is WB?  |        |              |                |          |     |     |      |         |         |          |         |
   //                           |     |     |     |        |              |                |          |     |     |      |         |         |          |         |
   RISCV.CSRRW0      -> List(  1.B,  1.B,  0.B,  1.B,  EXTYPE.INT,   INTUNIT.CSR,    INTUOP.CSRW,    0.B,  0.B,  0.B,  OP.XREG,  OP.X,     OP.IMM2,  IMM.X,    IMM.isI),
-  RISCV.CSRRW       -> List(  1.B,  1.B,  1.B,  1.B,  EXTYPE.INT,   INTUNIT.CSR,    INTUOP.CSRW,    0.B,  0.B,  0.B,  OP.XREG,  OP.X,     OP.IMM2,  IMM.X,    IMM.isI),
-  RISCV.CSRRS0      -> List(  1.B,  1.B,  1.B,  1.B,  EXTYPE.INT,   INTUNIT.CSR,    INTUOP.CSRX,    0.B,  0.B,  0.B,  OP.XREG,  OP.X,     OP.IMM2,  IMM.X,    IMM.isI),
-  RISCV.CSRRS       -> List(  1.B,  1.B,  1.B,  1.B,  EXTYPE.INT,   INTUNIT.CSR,    INTUOP.CSRS,    0.B,  0.B,  0.B,  OP.XREG,  OP.X,     OP.IMM2,  IMM.X,    IMM.isI),
-  RISCV.CSRRC0      -> List(  1.B,  1.B,  1.B,  1.B,  EXTYPE.INT,   INTUNIT.CSR,    INTUOP.CSRX,    0.B,  0.B,  0.B,  OP.XREG,  OP.X,     OP.IMM2,  IMM.X,    IMM.isI),
-  RISCV.CSRRC       -> List(  1.B,  1.B,  1.B,  1.B,  EXTYPE.INT,   INTUNIT.CSR,    INTUOP.CSRC,    0.B,  0.B,  0.B,  OP.XREG,  OP.X,     OP.IMM2,  IMM.X,    IMM.isI),
+  RISCV.CSRRW       -> List(  1.B,  1.B,  1.B,  1.B,  EXTYPE.INT,   INTUNIT.CSR,    INTUOP.CSRRW,   0.B,  0.B,  0.B,  OP.XREG,  OP.X,     OP.IMM2,  IMM.X,    IMM.isI),
+  RISCV.CSRRS0      -> List(  1.B,  1.B,  1.B,  1.B,  EXTYPE.INT,   INTUNIT.CSR,    INTUOP.CSRRX,   0.B,  0.B,  0.B,  OP.XREG,  OP.X,     OP.IMM2,  IMM.X,    IMM.isI),
+  RISCV.CSRRS       -> List(  1.B,  1.B,  1.B,  1.B,  EXTYPE.INT,   INTUNIT.CSR,    INTUOP.CSRRS,   0.B,  0.B,  0.B,  OP.XREG,  OP.X,     OP.IMM2,  IMM.X,    IMM.isI),
+  RISCV.CSRRC0      -> List(  1.B,  1.B,  1.B,  1.B,  EXTYPE.INT,   INTUNIT.CSR,    INTUOP.CSRRX,   0.B,  0.B,  0.B,  OP.XREG,  OP.X,     OP.IMM2,  IMM.X,    IMM.isI),
+  RISCV.CSRRC       -> List(  1.B,  1.B,  1.B,  1.B,  EXTYPE.INT,   INTUNIT.CSR,    INTUOP.CSRRC,   0.B,  0.B,  0.B,  OP.XREG,  OP.X,     OP.IMM2,  IMM.X,    IMM.isI),
   RISCV.CSRRWI0     -> List(  1.B,  1.B,  0.B,  1.B,  EXTYPE.INT,   INTUNIT.CSR,    INTUOP.CSRW,    0.B,  0.B,  0.B,  OP.IMM1,  OP.X,     OP.IMM2,  IMM.isC,  IMM.isI),
-  RISCV.CSRRWI      -> List(  1.B,  1.B,  1.B,  1.B,  EXTYPE.INT,   INTUNIT.CSR,    INTUOP.CSRW,    0.B,  0.B,  0.B,  OP.IMM1,  OP.X,     OP.IMM2,  IMM.isC,  IMM.isI),
-  RISCV.CSRRSI0     -> List(  1.B,  1.B,  1.B,  1.B,  EXTYPE.INT,   INTUNIT.CSR,    INTUOP.CSRX,    0.B,  0.B,  0.B,  OP.IMM1,  OP.X,     OP.IMM2,  IMM.isC,  IMM.isI),
-  RISCV.CSRRSI      -> List(  1.B,  1.B,  1.B,  1.B,  EXTYPE.INT,   INTUNIT.CSR,    INTUOP.CSRS,    0.B,  0.B,  0.B,  OP.IMM1,  OP.X,     OP.IMM2,  IMM.isC,  IMM.isI),
-  RISCV.CSRRCI0     -> List(  1.B,  1.B,  1.B,  1.B,  EXTYPE.INT,   INTUNIT.CSR,    INTUOP.CSRX,    0.B,  0.B,  0.B,  OP.IMM1,  OP.X,     OP.IMM2,  IMM.isC,  IMM.isI),
-  RISCV.CSRRCI      -> List(  1.B,  1.B,  1.B,  1.B,  EXTYPE.INT,   INTUNIT.CSR,    INTUOP.CSRC,    0.B,  0.B,  0.B,  OP.IMM1,  OP.X,     OP.IMM2,  IMM.isC,  IMM.isI)) 
+  RISCV.CSRRWI      -> List(  1.B,  1.B,  1.B,  1.B,  EXTYPE.INT,   INTUNIT.CSR,    INTUOP.CSRRW,   0.B,  0.B,  0.B,  OP.IMM1,  OP.X,     OP.IMM2,  IMM.isC,  IMM.isI),
+  RISCV.CSRRSI0     -> List(  1.B,  1.B,  1.B,  1.B,  EXTYPE.INT,   INTUNIT.CSR,    INTUOP.CSRRX,   0.B,  0.B,  0.B,  OP.IMM1,  OP.X,     OP.IMM2,  IMM.isC,  IMM.isI),
+  RISCV.CSRRSI      -> List(  1.B,  1.B,  1.B,  1.B,  EXTYPE.INT,   INTUNIT.CSR,    INTUOP.CSRRS,   0.B,  0.B,  0.B,  OP.IMM1,  OP.X,     OP.IMM2,  IMM.isC,  IMM.isI),
+  RISCV.CSRRCI0     -> List(  1.B,  1.B,  1.B,  1.B,  EXTYPE.INT,   INTUNIT.CSR,    INTUOP.CSRRX,   0.B,  0.B,  0.B,  OP.IMM1,  OP.X,     OP.IMM2,  IMM.isC,  IMM.isI),
+  RISCV.CSRRCI      -> List(  1.B,  1.B,  1.B,  1.B,  EXTYPE.INT,   INTUNIT.CSR,    INTUOP.CSRRC,   0.B,  0.B,  0.B,  OP.IMM1,  OP.X,     OP.IMM2,  IMM.isC,  IMM.isI)) 
 }
 
 object TABLEINT32M extends TABLEINT {
@@ -289,13 +289,13 @@ object TABLEINTZICBO extends TABLEINT {
   //                           | use Serial?     |      Ex Type          |                |          |   S2 Sign |    S1 Type     |         |      Imm1 Type     |
   //                           |     |   is WB?  |        |              |                |          |     |     |      |         |         |          |         |
   //                           |     |     |     |        |              |                |          |     |     |      |         |         |          |         |
-    RISCV.CBOCLEAN  -> List(  1.B,  1.B,  0.B,  1.B,  EXTYPE.INT,   INTUNIT.BRU,    INTUOP.CLEAN,   0.B,  0.B,  0.B,  OP.XREG,  OP.X,      OP.X,    IMM.X,    IMM.X),
-    RISCV.CBOINVAL  -> List(  1.B,  1.B,  0.B,  1.B,  EXTYPE.INT,   INTUNIT.BRU,    INTUOP.INVAL,   0.B,  0.B,  0.B,  OP.XREG,  OP.X,      OP.X,    IMM.X,    IMM.X),
-    RISCV.CBOFLUSH  -> List(  1.B,  1.B,  0.B,  1.B,  EXTYPE.INT,   INTUNIT.BRU,    INTUOP.FLUSH,   0.B,  0.B,  0.B,  OP.XREG,  OP.X,      OP.X,    IMM.X,    IMM.X),
-    RISCV.CBOZERO   -> List(  1.B,  1.B,  0.B,  1.B,  EXTYPE.INT,   INTUNIT.BRU,    INTUOP.ZERO,    0.B,  0.B,  0.B,  OP.XREG,  OP.X,      OP.X,    IMM.X,    IMM.X),
-    RISCV.PREFETCHI -> List(  1.B,  0.B,  0.B,  0.B,  EXTYPE.INT,   INTUNIT.BRU,    INTUOP.PFTCHE,  0.B,  0.B,  0.B,  OP.XREG,  OP.X,      OP.X,    IMM.X,    IMM.X),
-    RISCV.PREFETCHR -> List(  1.B,  0.B,  0.B,  0.B,  EXTYPE.INT,   INTUNIT.BRU,    INTUOP.PFTCHR,  0.B,  0.B,  0.B,  OP.XREG,  OP.X,      OP.X,    IMM.X,    IMM.X),
-    RISCV.PREFETCHW -> List(  1.B,  0.B,  0.B,  0.B,  EXTYPE.INT,   INTUNIT.BRU,    INTUOP.PFTCHW,  0.B,  0.B,  0.B,  OP.XREG,  OP.X,      OP.X,    IMM.X,    IMM.X))
+  RISCV.CBOCLEAN    -> List(  1.B,  1.B,  0.B,  1.B,  EXTYPE.INT,   INTUNIT.BRU,    INTUOP.CLEAN,   0.B,  0.B,  0.B,  OP.XREG,  OP.X,      OP.X,    IMM.X,    IMM.X),
+  RISCV.CBOINVAL    -> List(  1.B,  1.B,  0.B,  1.B,  EXTYPE.INT,   INTUNIT.BRU,    INTUOP.INVAL,   0.B,  0.B,  0.B,  OP.XREG,  OP.X,      OP.X,    IMM.X,    IMM.X),
+  RISCV.CBOFLUSH    -> List(  1.B,  1.B,  0.B,  1.B,  EXTYPE.INT,   INTUNIT.BRU,    INTUOP.FLUSH,   0.B,  0.B,  0.B,  OP.XREG,  OP.X,      OP.X,    IMM.X,    IMM.X),
+  RISCV.CBOZERO     -> List(  1.B,  1.B,  0.B,  1.B,  EXTYPE.INT,   INTUNIT.BRU,    INTUOP.ZERO,    0.B,  0.B,  0.B,  OP.XREG,  OP.X,      OP.X,    IMM.X,    IMM.X),
+  RISCV.PREFETCHI   -> List(  1.B,  0.B,  0.B,  0.B,  EXTYPE.INT,   INTUNIT.BRU,    INTUOP.PFTCHE,  0.B,  0.B,  0.B,  OP.XREG,  OP.X,      OP.X,    IMM.X,    IMM.X),
+  RISCV.PREFETCHR   -> List(  1.B,  0.B,  0.B,  0.B,  EXTYPE.INT,   INTUNIT.BRU,    INTUOP.PFTCHR,  0.B,  0.B,  0.B,  OP.XREG,  OP.X,      OP.X,    IMM.X,    IMM.X),
+  RISCV.PREFETCHW   -> List(  1.B,  0.B,  0.B,  0.B,  EXTYPE.INT,   INTUNIT.BRU,    INTUOP.PFTCHW,  0.B,  0.B,  0.B,  OP.XREG,  OP.X,      OP.X,    IMM.X,    IMM.X))
 }
 
 object TABLEINTPRIV extends TABLEINT {

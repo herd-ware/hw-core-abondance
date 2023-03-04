@@ -3,7 +3,7 @@
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-03-01 12:24:32 pm
+ * Last Modified: 2023-03-02 11:43:10 pm
  * Modified By: Mathieu Escouteloup
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
@@ -376,6 +376,8 @@ trait AbondanceParams extends PipelineParams {
   def nIOAddrBase: String
   def nScratch: Int
   def nCTimer: Int
+  def isHpmAct: Array[String]
+  def hasHpmMap: Array[String]
 
   def nUnCacheBase: String
   def nUnCacheByte: String
@@ -404,6 +406,7 @@ trait AbondanceParams extends PipelineParams {
     pPort           = Array(pL0DCrossBus)   ,
 
     debug           = debug           ,
+    nHart           = nHart           ,
     nAddrBit        = nAddrBit        ,
     nAddrBase       = nIOAddrBase     ,
 
@@ -411,7 +414,9 @@ trait AbondanceParams extends PipelineParams {
 
     useReqReg       = true            ,
     nScratch        = nScratch        ,
-    nCTimer         = nCTimer  
+    nCTimer         = nCTimer  ,
+    isHpmAct        = isHpmAct,
+    hasHpmMap       = hasHpmMap
   )
 
   def pL0DCross: Mb4sCrossbarParams = new Mb4sCrossbarConfig (
@@ -664,6 +669,8 @@ case class AbondanceConfig (
   nIOAddrBase: String,
   nScratch: Int,
   nCTimer: Int,
+  isHpmAct: Array[String],
+  hasHpmMap: Array[String],
 
   nUnCacheBase: String,
   nUnCacheByte: String,

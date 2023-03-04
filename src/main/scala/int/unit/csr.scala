@@ -1,10 +1,10 @@
 /*
- * File: csr.scala                                                             *
+ * File: csr.scala
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-03-02 07:12:53 pm                                       *
- * Modified By: Mathieu Escouteloup                                            *
+ * Last Modified: 2023-03-03 04:27:21 pm
+ * Modified By: Mathieu Escouteloup
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
  * Copyright (c) 2023 HerdWare                                                 *
@@ -85,16 +85,16 @@ class Csr(p: IntUnitParams) extends Module {
   io.b_csr.write.data := m_out.io.b_out.data.get.res
 
   w_is_write := false.B
-  switch(m_out.io.b_out.ctrl.get.ctrl.uop) {
-    is (CSRW)   {
+  switch(m_out.io.b_out.ctrl.get.ctrl.uop(1, 0)) {
+    is (CSRW, CSRRW)   {
       w_is_write := true.B
       io.b_csr.write.uop := CSRUOP.W
     }
-    is (CSRS)   {
+    is (CSRS, CSRRS)   {
       w_is_write := true.B
       io.b_csr.write.uop := CSRUOP.S
     }
-    is (CSRC)   {
+    is (CSRC, CSRRC)   {
       w_is_write := true.B
       io.b_csr.write.uop := CSRUOP.C
     }

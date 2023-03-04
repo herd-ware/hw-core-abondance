@@ -1,10 +1,10 @@
 /*
- * File: bus.scala                                                             *
+ * File: bus.scala
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-03-02 06:55:55 pm                                       *
- * Modified By: Mathieu Escouteloup                                            *
+ * Last Modified: 2023-03-03 08:00:20 am
+ * Modified By: Mathieu Escouteloup
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
  * Copyright (c) 2023 HerdWare                                                 *
@@ -19,7 +19,7 @@ import chisel3._
 import chisel3.util._
 
 import herd.common.gen._
-import herd.common.isa.hpc.{HpcInstrBus}
+import herd.common.core.{HpcInstrBus}
 import herd.core.aubrac.common.{TrapBus, EtdBus}
 import herd.core.aubrac.back.{OP, IMM}
 import herd.core.aubrac.hfu.{CODE => HFUCODE, OP => HFUOP}

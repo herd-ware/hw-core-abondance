@@ -1,10 +1,10 @@
 /*
- * File: pipeline.scala                                                        *
+ * File: pipeline.scala
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-03-02 07:06:20 pm                                       *
- * Modified By: Mathieu Escouteloup                                            *
+ * Last Modified: 2023-03-03 08:00:00 am
+ * Modified By: Mathieu Escouteloup
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
  * Copyright (c) 2023 HerdWare                                                 *
@@ -19,7 +19,7 @@ import chisel3._
 import chisel3.util._
 
 import herd.common.field._
-import herd.common.isa.hpc.{HpcMemoryBus}
+import herd.common.core.{HpcPipelineBus}
 import herd.common.mem.mb4s._
 import herd.common.mem.cbo._
 import herd.core.aubrac.common._
@@ -47,7 +47,8 @@ class Pipeline (p: PipelineParams) extends Module {
     val b_d1mem = new Mb4sIO(p.pL0D1Bus)    
     val b_cbo = if (p.useCbo) Some(new CboIO(1, p.useField, p.nField, p.nAddrBit)) else None
 
-    val i_hpc_mem = Input(new HpcMemoryBus())
+    val o_hpc = Output(new HpcPipelineBus())
+    val i_hpm = Input(Vec(32, UInt(64.W)))
 
     val b_hfu = if (p.useChamp) Some(Flipped(new HfuIO(p, p.nAddrBit, p.nDataBit, p.nChampTrapLvl))) else None
     val b_clint = Flipped(new ClintIO(p.nDataBit))
@@ -121,6 +122,7 @@ class Pipeline (p: PipelineParams) extends Module {
   m_back.io.i_br_up := m_int.io.o_br_up
   m_back.io.i_br_new := w_br_new
   m_back.io.b_clint <> io.b_clint
+  io.o_hpc := m_back.io.o_hpc
 
   // ------------------------------
   //             READ
@@ -269,8 +271,7 @@ class Pipeline (p: PipelineParams) extends Module {
   m_csr.io.b_read(0) <> m_int.io.b_csr.read
   m_csr.io.b_write(0) <> m_int.io.b_csr.write
 
-  m_csr.io.i_hpc_pipe(0) := m_back.io.o_hpc
-  m_csr.io.i_hpc_mem(0) := io.i_hpc_mem
+  m_csr.io.i_hpm(0) := io.i_hpm
   
   m_csr.io.i_trap(0) := m_back.io.o_trap
   if (p.useChamp) m_csr.io.b_hfu.get(0) <> io.b_hfu.get.csr

@@ -1,10 +1,10 @@
 /*
- * File: abondance.scala                                                       *
+ * File: abondance.scala
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-03-02 07:06:44 pm                                       *
- * Modified By: Mathieu Escouteloup                                            *
+ * Last Modified: 2023-03-03 02:31:14 pm
+ * Modified By: Mathieu Escouteloup
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
  * Copyright (c) 2023 HerdWare                                                 *
@@ -70,6 +70,7 @@ class Abondance (p: AbondanceParams) extends Module {
   }
 
   m_pipe.io.b_clint <> m_io.io.b_clint
+  m_pipe.io.i_hpm := m_io.io.o_hpm(0)
 
   // ******************************
   //          FIELD SELECT
@@ -106,8 +107,6 @@ class Abondance (p: AbondanceParams) extends Module {
   w_l1i_cbo(1) := true.B
 
   if (p.useL1I) {
-    m_pipe.io.i_hpc_mem.l1imiss := m_l1i.get.io.o_miss(0)
-
     if (p.useField) {
       m_l1i.get.io.b_field.get <> m_hfu.get.io.b_field
       m_l1i.get.io.b_part.get <> m_hfu.get.io.b_pall
@@ -122,9 +121,7 @@ class Abondance (p: AbondanceParams) extends Module {
     if (p.useField) m_l1i.get.io.i_slct_prev.get := m_pall.get.io.o_slct
     m_l1i.get.io.b_prev(0) <> m_pipe.io.b_imem
     if (!p.useL2) m_l1i.get.io.b_next <> io.b_imem.get
-  } else {
-    m_pipe.io.i_hpc_mem.l1imiss := 0.U
-    
+  } else {    
     m_pipe.io.b_imem <> io.b_imem.get
   }
 
@@ -150,8 +147,6 @@ class Abondance (p: AbondanceParams) extends Module {
   w_l1d_cbo(1) := true.B
 
   if (p.useL1D) {
-    m_pipe.io.i_hpc_mem.l1dmiss := m_l1d.get.io.o_miss(0)
-
     if (p.useField) {
       m_l1d.get.io.b_field.get <> m_hfu.get.io.b_field
       m_l1d.get.io.b_part.get <> m_hfu.get.io.b_pall
@@ -177,8 +172,6 @@ class Abondance (p: AbondanceParams) extends Module {
       m_llcross.get.io.b_m(1) <> m_l1d.get.io.b_next
       m_llcross.get.io.b_s(0) <> io.b_dmem.get
     }     
-  } else {
-    m_pipe.io.i_hpc_mem.l1dmiss := 0.U    
   }
 
   // ------------------------------
@@ -190,8 +183,6 @@ class Abondance (p: AbondanceParams) extends Module {
   w_l2_cbo(1) := true.B
 
   if (p.useL2) {
-    m_pipe.io.i_hpc_mem.l2miss := m_l2.get.io.o_miss(0)
-
     if (p.useField) {
       m_l2.get.io.b_field.get <> m_hfu.get.io.b_field
       for (f <- 0 until p.nField) {
@@ -258,8 +249,6 @@ class Abondance (p: AbondanceParams) extends Module {
     m_llcross.get.io.b_m(0) <> m_l0dcross.io.b_s(1)
     m_llcross.get.io.b_m(1) <> m_l2.get.io.b_next
     m_llcross.get.io.b_s(0) <> io.b_mem.get
-  } else {
-    m_pipe.io.i_hpc_mem.l2miss := 0.U
   }
   
   // ******************************
@@ -270,8 +259,11 @@ class Abondance (p: AbondanceParams) extends Module {
   } 
 
   // ******************************
-  //             CLINT
+  //              I/Os
   // ******************************
+  // ------------------------------
+  //             CLINT
+  // ------------------------------
   if (p.useChamp) {
     m_io.io.b_field.get <> m_hfu.get.io.b_field
 
@@ -280,6 +272,28 @@ class Abondance (p: AbondanceParams) extends Module {
   } else {
     m_io.io.i_irq_mei.get := io.i_irq_mei.get
     m_io.io.i_irq_msi.get := io.i_irq_msi.get
+  }
+
+  // ------------------------------
+  //              HPC
+  // ------------------------------
+  m_io.io.i_hpc_pipe(0) := m_pipe.io.o_hpc
+
+  m_io.io.i_hpc_mem(0) := 0.U.asTypeOf(m_io.io.i_hpc_mem(0))
+  if (p.useL1I) {
+    m_io.io.i_hpc_mem(0).l1ihit := m_l1i.get.io.o_hpc(0).hit
+    m_io.io.i_hpc_mem(0).l1ipftch := m_l1i.get.io.o_hpc(0).pftch
+    m_io.io.i_hpc_mem(0).l1imiss := m_l1i.get.io.o_hpc(0).miss
+  }
+  if (p.useL1D) {
+    m_io.io.i_hpc_mem(0).l1dhit := m_l1d.get.io.o_hpc(0).hit
+    m_io.io.i_hpc_mem(0).l1dpftch := m_l1d.get.io.o_hpc(0).pftch
+    m_io.io.i_hpc_mem(0).l1dmiss := m_l1d.get.io.o_hpc(0).miss
+  }
+  if (p.useL2) {
+    m_io.io.i_hpc_mem(0).l2hit := m_l2.get.io.o_hpc(0).hit
+    m_io.io.i_hpc_mem(0).l2pftch := m_l2.get.io.o_hpc(0).pftch
+    m_io.io.i_hpc_mem(0).l2miss := m_l2.get.io.o_hpc(0).miss
   }
 
   // ******************************

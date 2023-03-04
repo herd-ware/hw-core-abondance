@@ -1,10 +1,10 @@
 /*
- * File: ren.scala                                                             *
+ * File: ren.scala
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-03-02 06:57:21 pm                                       *
- * Modified By: Mathieu Escouteloup                                            *
+ * Last Modified: 2023-03-03 08:25:26 am
+ * Modified By: Mathieu Escouteloup
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
  * Copyright (c) 2023 HerdWare                                                 *
@@ -20,6 +20,7 @@ import chisel3.util._
 
 import herd.common.gen._
 import herd.common.field._
+import herd.common.isa.riscv.{CSR}
 import herd.common.mem.mb4s.{OP => LSUUOP}
 import herd.core.aubrac.back.{SlctImm}
 import herd.core.abondance.common._
@@ -112,6 +113,7 @@ class RenStage(p: BackParams) extends Module {
     io.b_rob(bp).data.hpc.st := (io.b_in(bp).ctrl.get.ex.ex_type === EXTYPE.LSU) & (io.b_in(bp).ctrl.get.ex.lsu.uop === LSUUOP.W)
     io.b_rob(bp).data.hpc.br := false.B
     io.b_rob(bp).data.hpc.mispred := false.B
+    io.b_rob(bp).data.hpc.rdcycle := (io.b_in(bp).ctrl.get.ex.ex_type === EXTYPE.INT) & (io.b_in(bp).ctrl.get.ex.int.unit === INTUNIT.CSR) & (m_imm2(bp).io.o_val(11, 0) === CSR.CYCLE.U) 
 
     io.b_rob(bp).trap := io.b_in(bp).ctrl.get.trap
     w_wait_rob(bp) := ~io.b_rob(bp).ready

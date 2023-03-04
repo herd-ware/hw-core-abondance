@@ -3,7 +3,7 @@
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-03-01 12:24:21 pm
+ * Last Modified: 2023-03-02 11:41:05 pm
  * Modified By: Mathieu Escouteloup
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
@@ -193,6 +193,8 @@ object AbondanceConfigBase extends AbondanceConfig (
   nIOAddrBase = "00100000",
   nScratch = 2,
   nCTimer = 2,
+  isHpmAct = Array("ALL"),
+  hasHpmMap = Array(),
 
   nUnCacheBase = "70000000",
   nUnCacheByte = "01000000",
