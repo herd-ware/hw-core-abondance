@@ -3,7 +3,7 @@
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-03-02 12:13:16 pm                                       *
+ * Last Modified: 2023-03-05 06:47:46 pm                                       *
  * Modified By: Mathieu Escouteloup                                            *
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
@@ -167,6 +167,8 @@ class IssStage(p: BackParams) extends Module {
     r_dep_spec := r_dep_br(io.i_br_new.tag)
   }.elsewhen(~w_wait) {
     r_dep_spec := w_dep_spec(p.nBackPort)
+  }.otherwise {
+    r_dep_spec := w_dep_spec(0)
   }
 
   // ******************************
