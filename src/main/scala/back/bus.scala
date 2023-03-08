@@ -1,10 +1,10 @@
 /*
- * File: bus.scala
+ * File: bus.scala                                                             *
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-03-03 08:00:20 am
- * Modified By: Mathieu Escouteloup
+ * Last Modified: 2023-03-08 09:37:30 am                                       *
+ * Modified By: Mathieu Escouteloup                                            *
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
  * Copyright (c) 2023 HerdWare                                                 *
@@ -44,7 +44,7 @@ class BranchDecodeBus extends Bundle {
 }
 
 // ******************************
-//       INFORMATIONS BUS
+//        INFORMATION BUS
 // ******************************
 class InfoBus(nAddrBit: Int, nInstrBit: Int, nRobEntry: Int) extends Bundle {
   val pc = UInt(nAddrBit.W)
