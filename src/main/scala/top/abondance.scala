@@ -1,10 +1,10 @@
 /*
- * File: abondance.scala
+ * File: abondance.scala                                                       *
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-03-03 02:31:14 pm
- * Modified By: Mathieu Escouteloup
+ * Last Modified: 2023-03-22 02:31:22 pm                                       *
+ * Modified By: Mathieu Escouteloup                                            *
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
  * Copyright (c) 2023 HerdWare                                                 *
@@ -370,6 +370,12 @@ class Abondance (p: AbondanceParams) extends Module {
   }
 
   // ******************************
+  //             REPORT
+  // ******************************
+  m_l0dcross.report("CORE LEVEL 0 DATA")
+  if (p.useL1D || p.useL2) m_llcross.get.report("CORE LAST-LEVEL")
+
+  // ******************************
   //             DEBUG
   // ******************************
   if (p.debug) {
@@ -380,6 +386,7 @@ class Abondance (p: AbondanceParams) extends Module {
     io.o_dbg.get.x := m_pipe.io.o_dbg.get.x
     io.o_dbg.get.csr := m_pipe.io.o_dbg.get.csr
     if (p.useChamp) io.o_dbg.get.hf.get := m_hfu.get.io.o_dbg.get
+    io.o_dbg.get.hpc := m_io.io.o_dbg.get.hpc(0)
 
     // ------------------------------
     //         DATA FOOTPRINT
