@@ -1,10 +1,10 @@
 /*
- * File: rob.scala
+ * File: rob.scala                                                             *
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-03-03 08:16:07 am
- * Modified By: Mathieu Escouteloup
+ * Last Modified: 2023-04-03 01:04:11 pm                                       *
+ * Modified By: Mathieu Escouteloup                                            *
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
  * Copyright (c) 2023 HerdWare                                                 *
@@ -136,7 +136,6 @@ class Rob(p: BackParams) extends Module {
         } else {
           r_entry(re).replay := false.B
         }
-        r_entry(re).hpc.br := io.b_end(eu).hpc.br
         r_entry(re).hpc.mispred := io.b_end(eu).hpc.mispred
       }
     }
@@ -220,18 +219,28 @@ class Rob(p: BackParams) extends Module {
   val w_hpc_alu = Wire(Vec(p.nCommit, Bool()))
   val w_hpc_ld = Wire(Vec(p.nCommit, Bool()))
   val w_hpc_st = Wire(Vec(p.nCommit, Bool()))
-  val w_hpc_br = Wire(Vec(p.nCommit, Bool()))
+  val w_hpc_bru = Wire(Vec(p.nCommit, Bool()))
   val w_hpc_mispred = Wire(Vec(p.nCommit, Bool()))
   val w_hpc_rdcycle = Wire(Vec(p.nCommit, Bool()))
+  val w_hpc_jal = Wire(Vec(p.nCommit, Bool()))
+  val w_hpc_jalr = Wire(Vec(p.nCommit, Bool()))
+  val w_hpc_call = Wire(Vec(p.nCommit, Bool()))
+  val w_hpc_ret = Wire(Vec(p.nCommit, Bool()))
+  val w_hpc_cflush = Wire(Vec(p.nCommit, Bool()))
 
   for (c <- 0 until p.nCommit) {
     w_hpc_instret(c) := w_cready(c) & r_entry(w_cpt(c)).valid & ~r_entry(w_cpt(c)).exc
     w_hpc_alu(c) := w_cready(c) & r_entry(w_cpt(c)).valid & r_entry(w_cpt(c)).hpc.alu
     w_hpc_ld(c) := w_cready(c) & r_entry(w_cpt(c)).valid & r_entry(w_cpt(c)).hpc.ld
     w_hpc_st(c) := w_cready(c) & r_entry(w_cpt(c)).valid & r_entry(w_cpt(c)).hpc.st
-    w_hpc_br(c) := w_cready(c) & r_entry(w_cpt(c)).valid & r_entry(w_cpt(c)).hpc.br
+    w_hpc_bru(c) := w_cready(c) & r_entry(w_cpt(c)).valid & r_entry(w_cpt(c)).hpc.bru
     w_hpc_mispred(c) := w_cready(c) & r_entry(w_cpt(c)).valid & r_entry(w_cpt(c)).hpc.mispred
     w_hpc_rdcycle(c) := w_cready(c) & r_entry(w_cpt(c)).valid & r_entry(w_cpt(c)).hpc.rdcycle
+    w_hpc_jal(c) := w_cready(c) & r_entry(w_cpt(c)).valid & r_entry(w_cpt(c)).hpc.jal
+    w_hpc_jalr(c) := w_cready(c) & r_entry(w_cpt(c)).valid & r_entry(w_cpt(c)).hpc.jalr
+    w_hpc_call(c) := w_cready(c) & r_entry(w_cpt(c)).valid & r_entry(w_cpt(c)).hpc.call
+    w_hpc_ret(c) := w_cready(c) & r_entry(w_cpt(c)).valid & r_entry(w_cpt(c)).hpc.ret
+    w_hpc_cflush(c) := w_cready(c) & r_entry(w_cpt(c)).valid & r_entry(w_cpt(c)).hpc.cflush
   }
 
   io.o_hpc := 0.U.asTypeOf(io.o_hpc)
@@ -239,9 +248,14 @@ class Rob(p: BackParams) extends Module {
   io.o_hpc.alu := PopCount(w_hpc_alu.asUInt)
   io.o_hpc.ld := PopCount(w_hpc_ld.asUInt)
   io.o_hpc.st := PopCount(w_hpc_st.asUInt)
-  io.o_hpc.br := PopCount(w_hpc_br.asUInt)
+  io.o_hpc.bru := PopCount(w_hpc_bru.asUInt)
   io.o_hpc.mispred := PopCount(w_hpc_mispred.asUInt)
   io.o_hpc.rdcycle := PopCount(w_hpc_rdcycle.asUInt)
+  io.o_hpc.jal := PopCount(w_hpc_jal.asUInt)
+  io.o_hpc.jalr := PopCount(w_hpc_jalr.asUInt)
+  io.o_hpc.call := PopCount(w_hpc_call.asUInt)
+  io.o_hpc.ret := PopCount(w_hpc_ret.asUInt)
+  io.o_hpc.cflush := PopCount(w_hpc_cflush.asUInt)
 
   // ******************************
   //              PT
