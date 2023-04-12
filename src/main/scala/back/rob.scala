@@ -3,7 +3,7 @@
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-04-03 01:04:11 pm                                       *
+ * Last Modified: 2023-04-11 05:44:43 pm                                       *
  * Modified By: Mathieu Escouteloup                                            *
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
@@ -215,47 +215,21 @@ class Rob(p: BackParams) extends Module {
   // ******************************
   //              HPC
   // ******************************
-  val w_hpc_instret = Wire(Vec(p.nCommit, Bool()))
-  val w_hpc_alu = Wire(Vec(p.nCommit, Bool()))
-  val w_hpc_ld = Wire(Vec(p.nCommit, Bool()))
-  val w_hpc_st = Wire(Vec(p.nCommit, Bool()))
-  val w_hpc_bru = Wire(Vec(p.nCommit, Bool()))
-  val w_hpc_mispred = Wire(Vec(p.nCommit, Bool()))
-  val w_hpc_rdcycle = Wire(Vec(p.nCommit, Bool()))
-  val w_hpc_jal = Wire(Vec(p.nCommit, Bool()))
-  val w_hpc_jalr = Wire(Vec(p.nCommit, Bool()))
-  val w_hpc_call = Wire(Vec(p.nCommit, Bool()))
-  val w_hpc_ret = Wire(Vec(p.nCommit, Bool()))
-  val w_hpc_cflush = Wire(Vec(p.nCommit, Bool()))
-
-  for (c <- 0 until p.nCommit) {
-    w_hpc_instret(c) := w_cready(c) & r_entry(w_cpt(c)).valid & ~r_entry(w_cpt(c)).exc
-    w_hpc_alu(c) := w_cready(c) & r_entry(w_cpt(c)).valid & r_entry(w_cpt(c)).hpc.alu
-    w_hpc_ld(c) := w_cready(c) & r_entry(w_cpt(c)).valid & r_entry(w_cpt(c)).hpc.ld
-    w_hpc_st(c) := w_cready(c) & r_entry(w_cpt(c)).valid & r_entry(w_cpt(c)).hpc.st
-    w_hpc_bru(c) := w_cready(c) & r_entry(w_cpt(c)).valid & r_entry(w_cpt(c)).hpc.bru
-    w_hpc_mispred(c) := w_cready(c) & r_entry(w_cpt(c)).valid & r_entry(w_cpt(c)).hpc.mispred
-    w_hpc_rdcycle(c) := w_cready(c) & r_entry(w_cpt(c)).valid & r_entry(w_cpt(c)).hpc.rdcycle
-    w_hpc_jal(c) := w_cready(c) & r_entry(w_cpt(c)).valid & r_entry(w_cpt(c)).hpc.jal
-    w_hpc_jalr(c) := w_cready(c) & r_entry(w_cpt(c)).valid & r_entry(w_cpt(c)).hpc.jalr
-    w_hpc_call(c) := w_cready(c) & r_entry(w_cpt(c)).valid & r_entry(w_cpt(c)).hpc.call
-    w_hpc_ret(c) := w_cready(c) & r_entry(w_cpt(c)).valid & r_entry(w_cpt(c)).hpc.ret
-    w_hpc_cflush(c) := w_cready(c) & r_entry(w_cpt(c)).valid & r_entry(w_cpt(c)).hpc.cflush
-  }
-
   io.o_hpc := 0.U.asTypeOf(io.o_hpc)
-  io.o_hpc.instret := PopCount(w_hpc_instret.asUInt)
-  io.o_hpc.alu := PopCount(w_hpc_alu.asUInt)
-  io.o_hpc.ld := PopCount(w_hpc_ld.asUInt)
-  io.o_hpc.st := PopCount(w_hpc_st.asUInt)
-  io.o_hpc.bru := PopCount(w_hpc_bru.asUInt)
-  io.o_hpc.mispred := PopCount(w_hpc_mispred.asUInt)
-  io.o_hpc.rdcycle := PopCount(w_hpc_rdcycle.asUInt)
-  io.o_hpc.jal := PopCount(w_hpc_jal.asUInt)
-  io.o_hpc.jalr := PopCount(w_hpc_jalr.asUInt)
-  io.o_hpc.call := PopCount(w_hpc_call.asUInt)
-  io.o_hpc.ret := PopCount(w_hpc_ret.asUInt)
-  io.o_hpc.cflush := PopCount(w_hpc_cflush.asUInt)
+  for (c <- 0 until p.nCommit) {
+    io.o_hpc.instret(c) := w_cready(c) & r_entry(w_cpt(c)).valid & ~r_entry(w_cpt(c)).exc
+    io.o_hpc.alu(c) := w_cready(c) & r_entry(w_cpt(c)).valid & r_entry(w_cpt(c)).hpc.alu
+    io.o_hpc.ld(c) := w_cready(c) & r_entry(w_cpt(c)).valid & r_entry(w_cpt(c)).hpc.ld
+    io.o_hpc.st(c) := w_cready(c) & r_entry(w_cpt(c)).valid & r_entry(w_cpt(c)).hpc.st
+    io.o_hpc.bru(c) := w_cready(c) & r_entry(w_cpt(c)).valid & r_entry(w_cpt(c)).hpc.bru
+    io.o_hpc.mispred(c) := w_cready(c) & r_entry(w_cpt(c)).valid & r_entry(w_cpt(c)).hpc.mispred
+    io.o_hpc.rdcycle(c) := w_cready(c) & r_entry(w_cpt(c)).valid & r_entry(w_cpt(c)).hpc.rdcycle
+    io.o_hpc.jal(c) := w_cready(c) & r_entry(w_cpt(c)).valid & r_entry(w_cpt(c)).hpc.jal
+    io.o_hpc.jalr(c) := w_cready(c) & r_entry(w_cpt(c)).valid & r_entry(w_cpt(c)).hpc.jalr
+    io.o_hpc.call(c) := w_cready(c) & r_entry(w_cpt(c)).valid & r_entry(w_cpt(c)).hpc.call
+    io.o_hpc.ret(c) := w_cready(c) & r_entry(w_cpt(c)).valid & r_entry(w_cpt(c)).hpc.ret
+    io.o_hpc.cflush(c) := w_cready(c) & r_entry(w_cpt(c)).valid & r_entry(w_cpt(c)).hpc.cflush
+  }
 
   // ******************************
   //              PT
