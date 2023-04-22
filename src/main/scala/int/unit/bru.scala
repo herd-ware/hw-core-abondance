@@ -1,10 +1,10 @@
 /*
- * File: bru.scala
+ * File: bru.scala                                                             *
  * Created Date: 2023-02-26 09:21:29 am                                        *
  * Author: Mathieu Escouteloup                                                 *
  * -----                                                                       *
- * Last Modified: 2023-03-03 08:01:49 am
- * Modified By: Mathieu Escouteloup
+ * Last Modified: 2023-04-03 01:04:44 pm                                       *
+ * Modified By: Mathieu Escouteloup                                            *
  * -----                                                                       *
  * License: See LICENSE.md                                                     *
  * Copyright (c) 2023 HerdWare                                                 *
@@ -315,7 +315,6 @@ class Bru (p: IntUnitParams) extends Module {
   val init_hpc = Wire(new HpcInstrBus())
 
   init_hpc := 0.U.asTypeOf(init_hpc)
-  init_hpc.br := false.B
   init_hpc.mispred := false.B
 
   val r_out = RegInit(init_out)
@@ -346,7 +345,6 @@ class Bru (p: IntUnitParams) extends Module {
           r_br_up(sp) := ~(io.b_in.valid & w_use_tag & (sp.U === io.b_in.ctrl.get.br.tag))
         }
 
-        r_hpc.br := io.b_in.valid & (w_jal | w_jalr | w_br)
         r_hpc.mispred := w_redirect
       }.otherwise {
         r_out.ctrl.get.br.mask := r_out.ctrl.get.br.mask & io.i_br_up
